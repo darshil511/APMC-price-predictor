@@ -7,9 +7,11 @@ import os
 import joblib
 import statsmodels
 from matplotlib import font_manager as fm
+from pathlib import Path
 
 
-font_path = "D:/APMC-price-predictor/NotoSerifGujarati-Black.ttf"
+base_dir = Path("D:/APMC-price-predictor")
+font_path = base_dir / "NotoSerifGujarati-Black.ttf"
 guj_fonts = fm.FontProperties(fname=font_path)
 
 
@@ -41,8 +43,8 @@ if category is not None:
         if product is not None:
             st.write(f"You choose to find prediction for   {product}")
             
-            file_path = 'D:/APMC-price-predictor/temp.csv'
-            save_dir = "./commodities_saved_models"
+            file_path = base_dir / "temp.csv"
+            save_dir = base_dir / "commodities_saved_models"
             
             data = pd.read_csv(file_path, parse_dates=['Date'], index_col='Date')
             
@@ -82,7 +84,7 @@ if category is not None:
                 pred_ci = pred.conf_int()
                 
                 # Step 7: Forecast Future Prices
-                forecast_steps = 10
+                forecast_steps = st.slider("Number of days to forecast:", min_value=1, max_value=30, value=10)
                 forecast = loaded_model.get_forecast(steps=forecast_steps)
                 forecast_mean = forecast.predicted_mean
                 forecast_ci = forecast.conf_int()
