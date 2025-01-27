@@ -6,6 +6,11 @@ import hashlib
 import os
 import joblib
 import statsmodels
+from matplotlib import font_manager as fm
+
+
+font_path = "D:/APMC-price-predictor/NotoSerifGujarati-Black.ttf"
+guj_fonts = fm.FontProperties(fname=font_path)
 
 
 def safe_filename(product_name):
@@ -56,8 +61,8 @@ if category is not None:
 
                 # Plot the raw price data for the selected commodity
                 data_figure = plt.figure(figsize=(12, 6))
-                plt.plot(price_data.index, price_data, label=f'{product_name} Prices', marker='o', linestyle='-')
-                plt.title(f'Price Trend for {product_name}')
+                plt.plot(price_data.index, price_data, label=f'Prices', marker='o', linestyle='-')
+                plt.title(f'Price Trend for {product_name}', fontproperties=guj_fonts)
                 plt.xlabel('Date')
                 plt.ylabel('Average Price')
                 plt.xticks(rotation=90)
@@ -103,7 +108,7 @@ if category is not None:
                 plt.ylim(price_data.min() * 0.95, price_data.max() * 1.05)
 
                 # # Graph labels and legend
-                plt.title(f'Price Prediction for {product_name}')
+                plt.title(f'Price Prediction for {product_name}', fontproperties=guj_fonts)
                 plt.xlabel('Date')
                 plt.ylabel('Average Price')
                 plt.xticks(rotation=90)
