@@ -1,0 +1,44 @@
+# Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Virtual environment
+.venv/
+env/
+
+# Flask instance folder
+instance/
+
+# Environment variable files
+.env
+*.env
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE-specific files
+.idea/
+.vscode/
+
+# Python packaging
+*.egg
+*.egg-info/
+dist/
+build/
+*.tar.gz
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Frontend dependencies (if you use npm/yarn)
+node_modules/
+
+# Python database files
+*.db
+*.sqlite3
+
