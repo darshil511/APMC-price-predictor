@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <title>Prediction Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Price Prediction for {{ product }}</h1>
-    <img src="data:image/png;base64,{{ plot_url }}" alt="Price Prediction Plot">
+    <img src="data:image/png;base64,{{ plot_url }}" alt="Price Prediction Plot" >
     <a href="/">Go Back</a>
 </body>
 </html>

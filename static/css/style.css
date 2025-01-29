@@ -1,0 +1,23 @@
+body {
+    background-image: url("../images/home_page_background.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;  
+    background-size: cover;
+}
+
+#heading {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    /* font-size: large; */
+    font-style: oblique;
+    margin-left: 30%;
+    margin-top: 3%;
+}
+
+#inputs {
+    color: gold;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-style: oblique;
+    font-size: large;
+    margin-left: 22%;
+    margin-top: 10%;
+}
