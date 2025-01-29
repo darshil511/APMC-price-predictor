@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Page</title>
+</head>
+<body>
+    <script>
+        // Show the alert with the message passed from Flask
+        alert("{{ message }}");
+
+        // Redirect to the homepage after 3 seconds
+        setTimeout(function() {
+            window.location.href = "{{ url_for('home') }}";
+        }, 3000);  // 3 seconds delay before redirecting
+    </script>
+</body>
+</html>
