@@ -40,7 +40,7 @@ def predict():
     product_data = data[data["Item Name"] == product]
 
     if product_data.empty:
-        error_message = "Given Product does not exist :(   Redirecting to homepage"
+        error_message = "Given Product does not exist :(   Redirecting to homepage...."
         return render_template("error.html", message=error_message)
 
     # Prepare file paths
@@ -49,7 +49,7 @@ def predict():
 
     # Check if the model exists
     if not os.path.exists(model_path):
-        error_message = "Model for the given product not found :(   Redirecting to homepage"
+        error_message = "Model for the given product not found :(    Redirecting to homepage...."
         return render_template("error.html", message=error_message)
 
     # Load the model

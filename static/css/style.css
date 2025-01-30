@@ -1,15 +1,16 @@
 body {
-    background-image: url("../images/home_page_background.jpg");
+    background-image: url("../images/home_page_background.jpeg");
     background-repeat: no-repeat;
     background-attachment: fixed;  
     background-size: cover;
+    /* background-position: center; */
 }
 
 #heading {
     font-family: Georgia, 'Times New Roman', Times, serif;
     /* font-size: large; */
     font-style: oblique;
-    margin-left: 30%;
+    margin-left: 32%;
     margin-top: 3%;
 }
 
