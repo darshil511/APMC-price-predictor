@@ -1,11 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Prediction Results</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Prediction Result</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <img src="data:image/png;base64,{{ plot_url }}" alt="Price Prediction Plot" >
-    <a href="/">Go Back</a>
+    <h1>Price Prediction Result for {{ product }}</h1>
+    
+    <canvas id="priceChart"></canvas>
+
+    <script>
+        const ctx = document.getElementById('priceChart').getContext('2d');
+        
+        const observedData = {{ response.observed | tojson }};
+        const predictedData = {{ response.predicted | tojson }};
+        const forecastData = {{ response.forecast | tojson }};
+        
+        const dates = {{ response.dates | tojson }};
+        const forecastDates = {{ response.forecast_dates | tojson }};
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dates.concat(forecastDates),
+                datasets: [
+                    {
+                        label: 'Observed Prices',
+                        data: observedData,
+                        borderColor: 'blue',
+                        fill: false,
+                    },
+                    {
+                        label: 'Predicted Prices',
+                        data: predictedData,
+                        borderColor: 'green',
+                        fill: false,
+                    },
+                    {
+                        label: 'Forecast Prices',
+                        data: forecastData.concat(new Array(forecastData.length).fill(null)), // Fill with nulls for alignment
+                        borderColor: 'red',
+                        borderDash: [5, 5],
+                        fill: false,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        type: 'category',
+                        title: {
+                            display: true,
+                            text: 'Dates'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Price'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>

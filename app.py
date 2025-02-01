@@ -34,13 +34,16 @@ def predict():
     # Get form data
     category = request.form.get("category")
     product = request.form.get("product")
+    
+    # category = "Commodities"
+    # product = "જીરૂ"
 
     # Load data
-    data = pd.read_csv(file_path, parse_dates=["Date"], index_col="Date")
+    data = pd.read_csv(file_path, parse_dates=["Date"], index_col="Date", dayfirst=True)
     product_data = data[data["Item Name"] == product]
 
     if product_data.empty:
-        error_message = "Given Product does not exist :(   Redirecting to homepage...."
+        error_message = "Oops.... Given Product does not exist :(   Redirecting to homepage...."
         return render_template("error.html", message=error_message)
 
     # Prepare file paths
@@ -65,30 +68,49 @@ def predict():
     forecast = loaded_model.get_forecast(steps=forecast_steps)
     forecast_mean = forecast.predicted_mean
     forecast_ci = forecast.conf_int()
-
-    # Plot the results
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(price_data.index, price_data, label="Observed", color="blue")
-    ax.plot(pred_mean.index, pred_mean, label="In-sample Prediction", color="orange")
-    ax.plot(forecast_mean.index, forecast_mean, label="Forecast", color="green")
-    ax.fill_between(forecast_ci.index, forecast_ci.iloc[:, 0], forecast_ci.iloc[:, 1], color="green", alpha=0.2)
     
-     # # Adjust the y-axis range based on observed and forecasted prices
-    plt.ylim(price_data.min() * 0.95, price_data.max() * 1.05)
-    ax.set_title(f"Price Prediction for {product}", fontproperties=guj_fonts)
-    ax.set_xlabel("Date")
-    plt.xticks(rotation=90)
-    ax.set_ylabel("Average Price")
-    ax.legend()
-    plt.tight_layout()
+    # Ensure indices are proper DateTime format
+    price_data.index = pd.to_datetime(price_data.index)
+    forecast_mean.index = pd.to_datetime(forecast_mean.index)
+    
+    print(price_data.index.dtype)  # Should be datetime64[ns]
+    print(forecast_mean.index.dtype)  # Should be datetime64[ns]
+    
+    # Send JSON Data
+    
+    response = {
+        "dates": [date.strftime("%d-%m-%Y") for date in price_data.index],
+        "observed": [float(val) for val in price_data.values],  # Convert to float
+        "predicted": [float(val) for val in pred_mean.values],  # Convert to float
+        "forecast_dates": [date.strftime("%d-%m-%Y") for date in forecast_mean.index],
+        "forecast": [float(val) for val in forecast_mean.values],  # Convert to float
+    }
+    return render_template("result.html", response=response, product=product)
+    # return jsonify(response)
 
-    # Save plot as a base64 string
-    img = BytesIO()
-    plt.savefig(img, format="png")
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode("utf8")
+    # # Plot the results
+    # fig, ax = plt.subplots(figsize=(10, 5))
+    # ax.plot(price_data.index, price_data, label="Observed", color="blue")
+    # ax.plot(pred_mean.index, pred_mean, label="In-sample Prediction", color="orange")
+    # ax.plot(forecast_mean.index, forecast_mean, label="Forecast", color="green")
+    # ax.fill_between(forecast_ci.index, forecast_ci.iloc[:, 0], forecast_ci.iloc[:, 1], color="green", alpha=0.2)
+    
+    #  # # Adjust the y-axis range based on observed and forecasted prices
+    # plt.ylim(price_data.min() * 0.95, price_data.max() * 1.05)
+    # ax.set_title(f"Price Prediction for {product}", fontproperties=guj_fonts)
+    # ax.set_xlabel("Date")
+    # plt.xticks(rotation=90)
+    # ax.set_ylabel("Average Price")
+    # ax.legend()
+    # plt.tight_layout()
 
-    return render_template("result.html", plot_url=plot_url, product=product)
+    # # Save plot as a base64 string
+    # img = BytesIO()
+    # plt.savefig(img, format="png")
+    # img.seek(0)
+    # plot_url = base64.b64encode(img.getvalue()).decode("utf8")
+
+    # return render_template("result.html", plot_url=plot_url, product=product)
 
 if __name__ == "__main__":
     app.run(debug=True)
