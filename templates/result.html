@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Price Prediction Result</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_result.css') }}">
 </head>
 <body>
     <h1>Price Prediction Result for {{ product }}</h1>
     
-    <div class="chart-container" style="position: relative; height:35%; width:60%;">
+    <div class="chart-container" id="chartContainer">
         <canvas id="priceChart"></canvas>
+        <div class="toggle-btn" id="toggleButton">⛶</div>
     </div>
+
+    <a class="back-button" href="/">Go Back</a>
 
 
     <script>
@@ -71,6 +75,21 @@
                 }
             }
         });
+
+        // Toggle Fullscreen Functionality
+        const chartContainer = document.getElementById("chartContainer");
+        const toggleButton = document.getElementById("toggleButton");
+
+        toggleButton.addEventListener("click", () => {
+            if (chartContainer.classList.contains("fullscreen")) {
+                chartContainer.classList.remove("fullscreen");
+                toggleButton.textContent = "⛶"; // Maximize icon
+            } else {
+                chartContainer.classList.add("fullscreen");
+                toggleButton.textContent = "✖"; // Minimize icon
+            }
+        });
+
     </script>
 </body>
 </html>
