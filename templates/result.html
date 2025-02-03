@@ -9,7 +9,10 @@
 <body>
     <h1>Price Prediction Result for {{ product }}</h1>
     
-    <canvas id="priceChart"></canvas>
+    <div class="chart-container" style="position: relative; height:35%; width:60%;">
+        <canvas id="priceChart"></canvas>
+    </div>
+
 
     <script>
         const ctx = document.getElementById('priceChart').getContext('2d');
@@ -20,6 +23,9 @@
         
         const dates = {{ response.dates | tojson }};
         const forecastDates = {{ response.forecast_dates | tojson }};
+
+        // Ensure forecast starts after last observed date
+        const alignedForecastData = new Array(dates.length).fill(null).concat(forecastData);
 
         new Chart(ctx, {
             type: 'line',
@@ -40,9 +46,8 @@
                     },
                     {
                         label: 'Forecast Prices',
-                        data: forecastData.concat(new Array(forecastData.length).fill(null)), // Fill with nulls for alignment
+                        data: alignedForecastData,
                         borderColor: 'red',
-                        borderDash: [5, 5],
                         fill: false,
                     }
                 ]

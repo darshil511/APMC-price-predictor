@@ -73,8 +73,20 @@ def predict():
     price_data.index = pd.to_datetime(price_data.index)
     forecast_mean.index = pd.to_datetime(forecast_mean.index)
     
-    print(price_data.index.dtype)  # Should be datetime64[ns]
-    print(forecast_mean.index.dtype)  # Should be datetime64[ns]
+    # print(price_data.index.dtype)  # Should be datetime64[ns]
+    # print(forecast_mean.index.dtype)  # Should be datetime64[ns]
+    # Ensure price_data.index is a DatetimeIndex
+    last_date = pd.to_datetime(price_data.index[-1])  # Get the last date in your data
+    forecast_horizon = len(forecast_mean)  # Number of future predictions
+    
+    # Generate future dates, excluding Sundays
+    future_dates = []
+    current_date = last_date + pd.Timedelta(days=1)
+
+    while len(future_dates) < forecast_horizon:
+        if current_date.weekday() != 6:  # 6 corresponds to Sunday
+            future_dates.append(current_date)
+        current_date += pd.Timedelta(days=1) 
     
     # Send JSON Data
     
@@ -82,7 +94,7 @@ def predict():
         "dates": [date.strftime("%d-%m-%Y") for date in price_data.index],
         "observed": [float(val) for val in price_data.values],  # Convert to float
         "predicted": [float(val) for val in pred_mean.values],  # Convert to float
-        "forecast_dates": [date.strftime("%d-%m-%Y") for date in forecast_mean.index],
+        "forecast_dates": [date.strftime("%d-%m-%Y") for date in future_dates],
         "forecast": [float(val) for val in forecast_mean.values],  # Convert to float
     }
     return render_template("result.html", response=response, product=product)
