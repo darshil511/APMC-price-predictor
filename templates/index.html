@@ -18,63 +18,38 @@
             <h2> <label for="product">Select a product:</label> </h2>
             <select id="product" name="product">
                 <option value="" disabled selected>Choose a product</option>
-                <option value="કપાસ બી. ટી.">કપાસ બી. ટી.</option>
-                <option value="ઘઉં લોકવન">ઘઉં લોકવન</option>
-                <option value="ઘઉં ટુકડા">ઘઉં ટુકડા</option>
-                <option value="મગફળી જીણી">મગફળી જીણી</option>
-                <option value="સિંગદાણા જાડા">સિંગદાણા જાડા</option>
-                <option value="સિંગ ફાડીયા">સિંગ ફાડીયા</option>
-                <option value="એરંડા / એરંડી">એરંડા / એરંડી</option>
-                <option value="જીરૂ">જીરૂ</option>
-                <option value="ક્લંજી">ક્લંજી</option>
-                <option value="વરીયાળી">વરીયાળી</option>
-                <option value="ધાણા">ધાણા</option>
-                <option value="લસણ સુકું">લસણ સુકું</option>
-                <option value="ડુંગળી લાલ">ડુંગળી લાલ</option>
-                <option value="અડદ">અડદ</option>
-                <option value="તુવેર">તુવેર</option>
-                <option value="રાયડો">રાયડો</option>
-                <option value="રાય">રાય</option>
-                <option value="મેથી">મેથી</option>
-                <option value="કાંગ">કાંગ</option>
-                <option value="કરીજીરી">કરીજીરી</option>
-                <option value="સુરજમુખી">સુરજમુખી</option>
-                <option value="ગુવાર બી">ગુવાર બી</option>
-                <option value="મગફળી જાડી">મગફળી જાડી</option>
-                <option value="સફેદ ચણા">સફેદ ચણા</option>
-                <option value="મગફળી નવી">મગફળી નવી</option>
-                <option value="તલ - તલી">તલ - તલી</option>
-                <option value="ધાણી">ધાણી</option>
-                <option value="બાજરો">બાજરો</option>
-                <option value="જુવાર">જુવાર</option>
-                <option value="મકાઇ">મકાઇ</option>
-                <option value="મગ">મગ</option>
-                <option value="ચણા">ચણા</option>
-                <option value="વાલ">વાલ</option>
-                <option value="વાલ પાપડી">વાલ પાપડી</option>
-                <option value="ચોળા / ચોળી">ચોળા / ચોળી</option>
-                <option value="સોયાબીન">સોયાબીન</option>
-                <option value="અજમાં">અજમાં</option>
-                <option value="ગોગળી">ગોગળી</option>
-                <option value="વટાણા">વટાણા</option>
-                <option value="તલ કાળા">તલ કાળા</option>
-                <option value="મઠ">મઠ</option>
-                <option value="ઇસબગુલ">ઇસબગુલ</option>
-                <option value="રાજગરો">રાજગરો</option>
-                <option value="તલ લાલ">તલ લાલ</option>
-                <option value="કપાસ નવો">કપાસ નવો</option>
-                <option value="સુવાદાણા">સુવાદાણા</option>
-                <option value="મગફળી 66">મગફળી 66</option>
-                <option value="અરીઠા">અરીઠા</option>
-                <option value="કળથી">કળથી</option>
-                <option value="મરચા સૂકા પટ્ટો">મરચા સૂકા પટ્ટો</option>
-                <option value="મરચા">મરચા</option>
-                <option value="ડુંગળી સફેદ">ડુંગળી સફેદ</option>
-                <option value="નવા ધાણા">નવા ધાણા</option>
             </select>
 
             <br>
             <button type="submit">Predict</button>
         </form>
+
+        <script>
+            const category = document.getElementById('category');
+            const product = document.getElementById('product');
+            const options = {
+                Commodities: ['કપાસ બી. ટી.', 'ઘઉં લોકવન', 'ઘઉં ટુકડા', 'મગફળી જીણી', 'સિંગદાણા જાડા', 'સિંગ ફાડીયા', 'એરંડા / એરંડી', 
+                                'જીરૂ', 'ક્લંજી', 'વરીયાળી', 'ધાણા', 'લસણ સુકું', 'ડુંગળી લાલ', 'અડદ', 'તુવેર', 'રાયડો', 'રાય', 'મેથી', 
+                                'કાંગ', 'કરીજીરી', 'સુરજમુખી', 'ગુવાર બી', 'મગફળી જાડી', 'સફેદ ચણા', 'મગફળી નવી', 'તલ - તલી', 'ધાણી', 
+                                'બાજરો', 'જુવાર', 'મકાઇ', 'મગ', 'ચણા', 'વાલ', 'વાલ પાપડી', 'ચોળા / ચોળી', 'સોયાબીન', 'અજમાં', 
+                                'ગોગળી', 'વટાણા', 'તલ કાળા', 'મઠ', 'ઇસબગુલ', 'રાજગરો', 'તલ લાલ', 'કપાસ નવો', 'સુવાદાણા', 'મગફળી 66', 
+                                'અરીઠા', 'કળથી', 'મરચા સૂકા પટ્ટો', 'મરચા', 'ડુંગળી સફેદ', 'નવા ધાણા'],
+                Fruits: ['Apple', 'Banana', 'Cherry'],
+                Vegetables: ['Carrot', 'Broccoli', 'Spinach']
+            };
+            category.addEventListener('change', function() {
+                product.innerHTML = '<option value="" disabled selected>Choose a product</option>';
+
+                const selectedValue = this.value;
+                if(selectedValue){
+                    options[selectedValue].forEach(function(item) {
+                        const option = document.createElement("option");
+                        option.value = item;
+                        option.textContent = item;
+                        product.appendChild(option);
+                    });
+                }
+            });
+        </script>
 </body>
 </html>
