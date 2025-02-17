@@ -9,12 +9,14 @@ from io import BytesIO
 import base64
 from matplotlib import font_manager as fm
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
 
-base_dir = Path("D:/APMC-price-predictor")
+base_dir = Path(os.getenv("BASE_DIRECTORY"))
 font_path = base_dir / "NotoSerifGujarati-Black.ttf"
 guj_fonts = fm.FontProperties(fname=font_path)
 file_path = base_dir / "data/commodities/commodities_price_data.csv"
@@ -125,4 +127,4 @@ def predict():
     # return render_template("result.html", plot_url=plot_url, product=product)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=os.getenv("PORT"))

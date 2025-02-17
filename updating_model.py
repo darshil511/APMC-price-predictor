@@ -18,10 +18,12 @@ from matplotlib import font_manager as fm
 import os
 import joblib
 import hashlib
+from dotenv import load_dotenv
+load_dotenv()
 
 
 ### removes data older than 4 months-----------------------------------------------------------------------------------------------
-base_dir = Path("D:/APMC-price-predictor")
+base_dir = Path(os.getenv("BASE_DIRECTORY"))
 file_path = base_dir / "data/commodities/commodities_price_data.csv"
 # csv_file = "commodities_price_data.csv"  # Update with your file path
 save_dir = base_dir / "models/commodities_saved_models"
@@ -156,10 +158,10 @@ def main():
     # driver = webdriver.Chrome()
 
     # # commodities_data_table = 
-    # getData(driver, file_path, "https://apmcgondal.scmsolution.in/Daily_Rate.aspx", 
-    #                                          "//div[@class='col-md-4']/input[@id='ctl00_ContentPlaceHolder1_txt_date']",
-    #                                          "//div[@class='col-md-2']/input[@id='ctl00_ContentPlaceHolder1_btn_show']",
-    #                                          "//table[@id='ctl00_ContentPlaceHolder1_grid_pak']")
+    # getData(driver, file_path, os.getenv("COMMODITIES_WEBPAGE_PATH"), 
+    #                                          os.getenv("COMMODITIES_DATE_PATH"),
+    #                                          os.getenv("COMMODITIES_SUBMIT_BUTTON_PATH"),
+    #                                          os.getenv("COMMODITIES_TABLE_PATH"))
     
     time.sleep(5)
     
