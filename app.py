@@ -17,7 +17,7 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
 base_dir = Path("D:/APMC-price-predictor")
 font_path = base_dir / "NotoSerifGujarati-Black.ttf"
 guj_fonts = fm.FontProperties(fname=font_path)
-file_path = base_dir / "data/commodities/temp.csv"
+file_path = base_dir / "data/commodities/commodities_price_data.csv"
 model_dir = base_dir / "models/commodities_saved_models"
 
 def safe_filename(product_name):

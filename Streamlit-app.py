@@ -43,7 +43,7 @@ if category is not None:
         if product is not None:
             st.write(f"You choose to find prediction for   {product}")
             
-            file_path = base_dir / "data/commodities/temp.csv"
+            file_path = base_dir / "data/commodities/commodities_price_data.csv"
             save_dir = base_dir / "models/commodities_saved_models"
             
             data = pd.read_csv(file_path, parse_dates=['Date'], index_col='Date')

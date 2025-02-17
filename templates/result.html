@@ -25,6 +25,7 @@
         const forecastData = {{ response.forecast | tojson }};
         
         const dates = {{ response.dates | tojson }};
+        console.log(dates)
         const forecastDates = {{ response.forecast_dates | tojson }};
 
         const totalDuration = 2000;
