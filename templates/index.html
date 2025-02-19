@@ -32,21 +32,29 @@
         product.innerHTML = '<option value="" disabled selected>Choose a product</option>'
       
         const selectedValue = this.value
-        console.log(selectedValue)
         if (selectedValue) {
-          const filteredProducts = [];
-          const items = {{ items | tojson }}
-
-          items.forEach(function (item){
-            filteredProducts.push(item)
+          // Send request to backend
+          fetch('/get-products', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ category: selectedValue })
           })
-
-          filteredProducts.forEach(function (productName) {
-            const option = document.createElement('option');
-            option.value = productName;
-            option.textContent = productName;
-            product.appendChild(option);
-          });
+          .then(response => response.json())
+          .then(data => {
+            if (data.products && data.products.length > 0) {
+              data.products.forEach(function (productName) {
+                const option = document.createElement('option');
+                option.value = productName;
+                option.textContent = productName;
+                product.appendChild(option);
+              });
+            } else {
+              console.log('No products found');
+            }
+          })
+          .catch(error => console.error('Error fetching products:', error));
         }
       })
     </script>

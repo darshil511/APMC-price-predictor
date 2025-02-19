@@ -19,19 +19,49 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
 base_dir = Path(os.getenv("BASE_DIRECTORY"))
 font_path = base_dir / "NotoSerifGujarati-Black.ttf"
 guj_fonts = fm.FontProperties(fname=font_path)
-file_path = base_dir / "data/commodities/commodities_price_data.csv"
-model_dir = base_dir / "models/commodities_saved_models"
+global_file_path = base_dir / "data/commodities/commodities_price_data.csv"
+global_model_dir = base_dir / "models/commodities_saved_models"
 
 def safe_filename(product_name):
     return hashlib.md5(product_name.encode('utf-8')).hexdigest()
 
+@app.route('/get-products', methods=['POST'])
+def get_products():
+    data = request.get_json()
+    category = data.get("category")
+
+    # Normalize category name (capitalize first letter, lowercase rest)
+    category = category.capitalize()
+
+    # Dynamically construct file path and model directory
+    file_path = base_dir / f"data/{category}/{category}_price_data.csv"
+    global_file_path = file_path
+    model_dir = base_dir / f"models/{category}_saved_models"
+    global_model_dir = model_dir
+
+    try:
+        # Check if the file exists
+        if not file_path.exists():
+            return jsonify({"error": f"Data file for {category} not found"}), 404
+
+        # Read CSV file
+        df = pd.read_csv(file_path)
+
+        # Extract unique product names
+        if "Item Name" in df.columns:
+            products = df["Item Name"].dropna().unique().tolist()
+        else:
+            return jsonify({"error": "Invalid CSV format"}), 500
+
+        return jsonify({"products": products, "model_dir": str(model_dir)})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route("/")
 def home():
-    data = pd.read_csv(file_path, parse_dates=["Date"], index_col="Date", dayfirst=True)
-    unique_products = data["Item Name"].unique().tolist()
-    # print(unique_products)
-    return render_template("index.html", items=unique_products)
+    return render_template("index.html")
 
 
 @app.route("/predict", methods=["POST"])
@@ -44,7 +74,7 @@ def predict():
     # product = "જીરૂ"
 
     # Load data
-    data = pd.read_csv(file_path, parse_dates=["Date"], index_col="Date", dayfirst=True)
+    data = pd.read_csv(global_file_path, parse_dates=["Date"], index_col="Date", dayfirst=True)
     product_data = data[data["Item Name"] == product]
 
     if product_data.empty:
@@ -53,7 +83,7 @@ def predict():
 
     # Prepare file paths
     hashed_name = safe_filename(product)
-    model_path = os.path.join(model_dir, f"arima_model_{hashed_name}.pkl")
+    model_path = os.path.join(global_model_dir, f"arima_model_{hashed_name}.pkl")
 
     # Check if the model exists
     if not os.path.exists(model_path):
