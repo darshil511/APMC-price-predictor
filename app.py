@@ -28,7 +28,10 @@ def safe_filename(product_name):
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    data = pd.read_csv(file_path, parse_dates=["Date"], index_col="Date", dayfirst=True)
+    unique_products = data["Item Name"].unique().tolist()
+    # print(unique_products)
+    return render_template("index.html", items=unique_products)
 
 
 @app.route("/predict", methods=["POST"])
