@@ -9,10 +9,32 @@ from io import BytesIO
 import base64
 from matplotlib import font_manager as fm
 from pathlib import Path
+from config import Config
+from models import db, User
+from auth import auth_bp  # Import authentication blueprint
+from flask_login import LoginManager
+from flask_migrate import Migrate
 from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+app.config.from_object(Config)
+
+# Initialize Database
+db.init_app(app)
+
+migrate = Migrate(app, db)
+
+# Initialize Login Manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))  # Load user from DB
+
+# Register Blueprint
+app.register_blueprint(auth_bp, url_prefix='/auth')
 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
 
@@ -20,7 +42,7 @@ base_dir = Path(os.getenv("BASE_DIRECTORY"))
 font_path = base_dir / "NotoSerifGujarati-Black.ttf"
 guj_fonts = fm.FontProperties(fname=font_path)
 global_file_path = base_dir / "data/commodities/commodities_price_data.csv"
-global_model_dir = base_dir / "models/commodities_saved_models"
+global_model_dir = base_dir / "ml_models/commodities_saved_models"
 
 def safe_filename(product_name):
     return hashlib.md5(product_name.encode('utf-8')).hexdigest()
@@ -36,7 +58,7 @@ def get_products():
     # Dynamically construct file path and model directory
     file_path = base_dir / f"data/{category}/{category}_price_data.csv"
     global_file_path = file_path
-    model_dir = base_dir / f"models/{category}_saved_models"
+    model_dir = base_dir / f"ml_models/{category}_saved_models"
     global_model_dir = model_dir
 
     try:

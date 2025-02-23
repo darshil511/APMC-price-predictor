@@ -5,6 +5,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style_index.css') }}" />
   </head>
   <body>
+    <div class="topnav">
+      <a class="active" href="/">Home</a>
+      <a href="/">About</a>
+      <a href="/">Contact</a>
+      <div class="login-container">
+        <form action="/auth/login" method="GET">
+          <button type="submit">Login</button>
+        </form>
+      </div>
+    </div>
     <h1 id="heading">Welcome to APMC Price Predictor!</h1>
     <form id="inputs" action="/predict" method="POST">
       <h2><label for="category">Category:</label></h2>

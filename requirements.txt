@@ -7,3 +7,8 @@ joblib==1.1.0           # Joblib for saving/loading the ARIMA model
 matplotlib==3.5.2       # Matplotlib for plotting (if you're visualizing data or results)
 flask-cors==3.1.1       # Flask CORS for handling cross-origin requests (if needed)
 python-dotenv==1.21.0
+Flask-SQLAlchemy==2.5.1
+Flask-Bcrypt==1.0.0
+Flask-Login==0.6.2
+psycopg2==2.9.3
+Flask-Migrate==3.1.0
