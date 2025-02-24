@@ -101,7 +101,7 @@ def predict():
 
     if product_data.empty:
         error_message = "Oops.... Given Product does not exist :(   Redirecting to homepage...."
-        return render_template("error.html", message=error_message)
+        return render_template("error.html", message=error_message, page='home')
 
     # Prepare file paths
     hashed_name = safe_filename(product)
@@ -110,7 +110,7 @@ def predict():
     # Check if the model exists
     if not os.path.exists(model_path):
         error_message = "Model for the given product not found :(    Redirecting to homepage...."
-        return render_template("error.html", message=error_message)
+        return render_template("error.html", message=error_message, page='home')
 
     # Load the model
     loaded_model = joblib.load(model_path)

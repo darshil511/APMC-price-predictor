@@ -100,4 +100,71 @@ body {
       border: 1px solid #ccc;
     }
   }
+
+  /* General styles for the alert */
+.alert {
+  padding: 15px;
+  margin: 0 auto 20px auto;
+  width: 80%; /* Adjust the width of the alert */
+  max-width: 500px; /* Limit the maximum width */
+  border-radius: 8px;
+  font-size: 16px;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%); /* Center the alert horizontally */
+  z-index: 9999; /* Ensure it's above other content */
+  opacity: 0; /* Start with an invisible alert */
+  transition: all 0.5s ease-in-out; /* Smooth transition for the alert */
+  top: -50px;
+  visibility: hidden;
+}
+
+/* Success message style */
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+/* Danger message style */
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Active state for the alert (when it's visible) */
+.alert.show {
+  opacity: 1;
+  top: 10%; /* 10% from the top of the page */
+  visibility: visible;
+  animation: slideDown 1s ease-out; /* Animation for the transition */
+}
+
+/* Keyframes for slide-down effect */
+@keyframes slideDown {
+  0% {
+      top: -50px; /* Start from just above the top */
+      opacity: 0;
+  }
+  100% {
+      top: 10%; /* End at the top center of the page */
+      opacity: 1;
+  }
+}
+
+/* Optional: Add fade-out effect after a certain time */
+.alert.hide {
+  animation: fadeOut 1s ease-out forwards;
+}
+
+/* Keyframes for fade-out effect */
+@keyframes fadeOut {
+  0% {
+      opacity: 1;
+  }
+  100% {
+      opacity: 0;
+      top: -50px; /* Move it out of view */
+      visibility: hidden;
+  }
+}
   

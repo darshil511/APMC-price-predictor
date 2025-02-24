@@ -1,0 +1,186 @@
+/* General Body Styles */
+body {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    transition: background-image 0.5s ease-in-out;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* .alert {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+} */
+
+
+/* Container for the Login/Register Box */
+.login-container, .register-container {
+    background: rgba(255, 255, 255, 0.7); /* Slight transparency for a soft effect */
+    padding: 30px;
+    border-radius: 12px; /* Smooth rounded corners */
+    text-align: center;
+    width: 100%;
+    max-width: 400px; /* Limit the width to 400px */
+    margin: 20px auto;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+    transition: box-shadow 0.3s ease;
+}
+
+/* Hover effect on the container */
+.login-container:hover, .register-container:hover {
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.5); /* Enhanced shadow on hover */
+}
+
+/* Title (Login/Register) Styling */
+h2 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Input Fields */
+input[type="text"], input[type="password"], input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0 20px 0;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border 0.3s ease;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+    border-color: #4CAF50; 
+    /* border-color: #6C63FF; */
+    outline: none;
+}
+
+/* Button Styles */
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #4CAF50;
+    /* background-color: #6C63FF; */
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #388E3C; 
+    /* background-color: #5a54e6; */
+}
+
+/* Links (e.g., "Forgot password", "Register") */
+a {
+    color: #4CAF50;
+    /* color: #6C63FF; */
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 10px;
+    display: block;
+}
+
+a:hover {
+    text-decoration: underline; /* Underline effect on hover */
+}
+
+/* Optional error message */
+/* .error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+    font-weight: bold;
+} */
+
+
+/* -------------------------------------------------------------------- */
+/* General styles for the alert */
+.alert {
+    padding: 15px;
+    margin: 0 auto 20px auto;
+    width: 80%; /* Adjust the width of the alert */
+    max-width: 500px; /* Limit the maximum width */
+    border-radius: 8px;
+    font-size: 16px;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%); /* Center the alert horizontally */
+    z-index: 9999; /* Ensure it's above other content */
+    opacity: 0; /* Start with an invisible alert */
+    transition: all 0.5s ease-in-out; /* Smooth transition for the alert */
+    top: -50px;
+    visibility: hidden;
+}
+
+/* Success message style */
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Danger message style */
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Active state for the alert (when it's visible) */
+.alert.show {
+    opacity: 1;
+    top: 10%; /* 10% from the top of the page */
+    visibility: visible;
+    animation: slideDown 1s ease-out; /* Animation for the transition */
+}
+
+/* Keyframes for slide-down effect */
+@keyframes slideDown {
+    0% {
+        top: -50px; /* Start from just above the top */
+        opacity: 0;
+    }
+    100% {
+        top: 10%; /* End at the top center of the page */
+        opacity: 1;
+    }
+}
+
+/* Optional: Add fade-out effect after a certain time */
+.alert.hide {
+    animation: fadeOut 1s ease-out forwards;
+}
+
+/* Keyframes for fade-out effect */
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        top: -50px; /* Move it out of view */
+        visibility: hidden;
+    }
+}

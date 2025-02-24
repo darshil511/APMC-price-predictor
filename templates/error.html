@@ -34,7 +34,7 @@
 
         // Redirect to the homepage after 3 seconds
         setTimeout(function() {
-            window.location.href = "{{ url_for('home') }}";
+            window.location.href = "{{ url_for(page) }}";
         }, 3000);  // 3 seconds delay before redirecting
     </script>
 </body>
