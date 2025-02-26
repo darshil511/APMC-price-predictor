@@ -1,0 +1,169 @@
+/* General Page Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+}
+
+h2 {
+    color: #333;
+}
+
+/* Registered Crops List */
+.crops-container {
+    margin-top: 20px;
+    padding: 10px;
+    background: #e8f5e9;
+    border-radius: 8px;
+}
+
+.crops-container ul {
+    list-style: none;
+    padding: 0;
+}
+
+.crops-container li {
+    display: flex;
+    justify-content: space-between;
+    background: #d4edda;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Dropdown & Buttons */
+select,
+button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button {
+    background: #28a745;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+button:hover {
+    background: #218838;
+}
+
+/* Remove Button */
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.remove-btn:hover {
+    background: #c82333;
+}
+
+.back-button {
+    margin-left: 46%;
+    text-decoration: underline;
+}
+
+
+/* General styles for the alert */
+.alert {
+    padding: 15px;
+    margin: 0 auto 20px auto;
+    width: 80%;
+    /* Adjust the width of the alert */
+    max-width: 500px;
+    /* Limit the maximum width */
+    border-radius: 8px;
+    font-size: 16px;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    /* Center the alert horizontally */
+    z-index: 9999;
+    /* Ensure it's above other content */
+    opacity: 0;
+    /* Start with an invisible alert */
+    transition: all 0.5s ease-in-out;
+    /* Smooth transition for the alert */
+    top: -50px;
+    visibility: hidden;
+}
+
+/* Success message style */
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Danger message style */
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Active state for the alert (when it's visible) */
+.alert.show {
+    opacity: 1;
+    top: 10%;
+    /* 10% from the top of the page */
+    visibility: visible;
+    animation: slideDown 1s ease-out;
+    /* Animation for the transition */
+}
+
+/* Keyframes for slide-down effect */
+@keyframes slideDown {
+    0% {
+        top: -50px;
+        /* Start from just above the top */
+        opacity: 0;
+    }
+
+    100% {
+        top: 10%;
+        /* End at the top center of the page */
+        opacity: 1;
+    }
+}
+
+/* Optional: Add fade-out effect after a certain time */
+.alert.hide {
+    animation: fadeOut 1s ease-out forwards;
+}
+
+/* Keyframes for fade-out effect */
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        top: -50px;
+        /* Move it out of view */
+        visibility: hidden;
+    }
+}

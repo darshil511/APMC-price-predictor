@@ -10,9 +10,21 @@
       <a href="/">About</a>
       <a href="/">Contact</a>
       <div class="login-container">
-        <form action="/auth/login" method="GET">
-          <button type="submit">Login</button>
-        </form>
+        {% if current_user.is_authenticated %}
+          <li class="profile">
+            <a href="{{ url_for('auth.profile') }}">
+              <img src="{{ url_for('static', filename='images/profile_icon.png') }}" alt="Profile" class="profile-icon" />
+              {{ current_user.name }}
+            </a>
+            <form action="/auth/logout" method="POST">
+              <button type="submit">Logout</button>
+            </form>
+          </li>
+        {% else %}
+          <form action="/auth/login" method="GET">
+            <button type="submit">Login</button>
+          </form>
+        {% endif %}
       </div>
     </div>
     <h1 id="heading">Welcome to APMC Price Predictor!</h1>
@@ -20,9 +32,9 @@
       <h2><label for="category">Category:</label></h2>
       <select name="category" id="category">
         <option value="" disabled selected>Select category</option>
-        <option value="Commodities">Commodities</option>
-        <option value="Fruits">Fruits</option>
-        <option value="Vegetables">Vegetables</option>
+        <option value="Commodities">જણસી</option>
+        <option value="Fruits">ફળ</option>
+        <option value="Vegetables">શાકભાજી</option>
       </select>
       <br />
       <h2><label for="product">Select a product:</label></h2>

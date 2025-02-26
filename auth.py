@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, request, url_for, flash, session, make_response
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from models import db, User
 
 auth_bp = Blueprint('auth', __name__)
@@ -53,7 +53,7 @@ def login():
     return render_template('login.html')
 
 # User Logout
-@auth_bp.route('/logout')
+@auth_bp.route('/logout', methods=['POST'])
 @login_required
 def logout():
     # resp = make_response(redirect(url_for('auth.login')))
@@ -63,5 +63,10 @@ def logout():
     # session.clear()
     logout_user()
     flash('You have been logged out.', 'success')
-    # return resp
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('home'))
+
+
+@auth_bp.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', user=current_user)

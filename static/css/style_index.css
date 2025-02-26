@@ -25,9 +25,24 @@ body {
 
 
 /* Style the navbar */
+.profile {
+  display: flex;
+  align-items: center;
+  font-size: 17px;
+}
+
+.profile-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
 .topnav {
     overflow: hidden;
-    background-color: #e9e9e9;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    /* background-color: #e9e9e9; */
   }
   
   /* Navbar links */
@@ -69,18 +84,19 @@ body {
   
   /* Style the button inside the input container */
   .topnav .login-container button {
+    font-family: Georgia, 'Times New Roman', Times, serif;
     float: right;
     padding: 6px;
-    margin-top: 8px;
+    /* margin-top: auto; */
     margin-right: 16px;
-    background: #ddd;
+    background: none;
     font-size: 17px;
     border: none;
     cursor: pointer;
   }
   
   .topnav .login-container button:hover {
-    background: #ccc;
+    background: #ddd;
   }
   
   /* Add responsiveness - On small screens, display the navbar vertically instead of horizontally */

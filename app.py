@@ -11,8 +11,9 @@ from matplotlib import font_manager as fm
 from pathlib import Path
 from config import Config
 from models import db, User
-from auth import auth_bp  # Import authentication blueprint
-from flask_login import LoginManager
+from auth import auth_bp
+from crops import crops_bp
+from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 load_dotenv()
@@ -33,8 +34,14 @@ login_manager.init_app(app)
 def load_user(user_id):
     return User.query.get(int(user_id))  # Load user from DB
 
+
+@app.context_processor
+def inject_user():
+    return dict(current_user=current_user)
+
 # Register Blueprint
 app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(crops_bp, url_prefix='/crops')
 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
 

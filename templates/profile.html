@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile | APMC Price Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_profile.css') }}">
+</head>
+<body>
+    <div class="profile-container">
+        <h2>{{ current_user.name }}</h2>
+        <h3>Registered Crops</h3>
+        <ul id="crop-list">
+            {% if user_crops %}
+                {% for crop in user_crops %}
+                    <li>{{ crop.category }} - {{ crop.crop_name }} <button class="delete-btn" data-crop="{{ crop.crop_name }}" data-category="{{ crop.category }}">Remove</button></li>
+                {% endfor %}
+            {% else %}
+                <p>No crops registered.</p>
+            {% endif %}
+        </ul>
+        
+        <h3>Add New Crop</h3>
+        <label for="category">Select Category:</label>
+        <select id="category">
+            <option value="" disabled selected>Select category</option>
+            <option value="Commodities">જણસી</option>
+            <option value="Fruits">ફળ</option>
+            <option value="Vegetables">શાકભાજી</option>
+        </select>
+        
+        <label for="crop">Select Crop:</label>
+        <select id="crop">
+            <option value="">--Select Crop--</option>
+        </select>
+        
+        <button id="add-crop-btn">Add Crop</button>
+        <a class="back-button" href="/">Go Back</a>
+    </div>
+
+    {% with messages=get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    
+    <script>
+        window.addEventListener('load', function () {
+            const alerts = document.querySelectorAll('.alert')
+          
+            // Show alert for a certain amount of time
+            alerts.forEach(function (alert) {
+              alert.classList.add('show') // Show the alert with animation
+          
+              // Automatically hide the alert after 5 seconds (or adjust timing)
+              setTimeout(function () {
+                alert.classList.remove('show') // Hide with animation
+                alert.classList.add('hide') // Add the hide class after the show
+                setTimeout(() => alert.remove(), 1000)
+              }, 5000) // Keep the alert visible for 5 seconds
+            })
+          })
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryDropdown = document.getElementById('category');
+            const cropDropdown = document.getElementById('crop');
+            const addCropBtn = document.getElementById('add-crop-btn');
+            const cropList = document.getElementById('crop-list');
+
+
+            // Fetch crops based on selected category
+            categoryDropdown.addEventListener('change', function() {
+                const selectedCategory = categoryDropdown.value;
+                cropDropdown.innerHTML = '<option value="">--Select Crop--</option>';
+                
+                if (selectedCategory) {
+                    fetch('/get-products', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ category: selectedCategory })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        data.products.forEach(crop => {
+                            const option = document.createElement('option');
+                            option.value = crop;
+                            option.textContent = crop;
+                            cropDropdown.appendChild(option);
+                        });
+                    });
+                }
+            });
+
+            fetch('/crops/show-crops')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const cropList = document.getElementById('crop-list');
+                    cropList.innerHTML = ''; // Clear the list before adding items
+
+                    if (data.crops.length === 0) {
+                        cropList.innerHTML = '<li>No crops registered.</li>';
+                    } else {
+                        data.crops.forEach(crop => {
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = `${crop.category} - ${crop.crop_name} 
+                                <button class="delete-btn" data-crop="${crop.crop_name}" data-category="${crop.category}">Remove</button>`;
+                            cropList.appendChild(listItem);
+                        });
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching crops:', error));
+
+            // Add crop to registered crops
+            addCropBtn.addEventListener('click', function() {
+                const category = categoryDropdown.value;
+                const crop = cropDropdown.value;
+                
+                if (category && crop) {
+                    fetch('/crops/add-crop', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ category: category, crop_name: crop })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = `${category} - ${crop} <button class="delete-btn" data-crop="${crop}" data-category="${category}">Remove</button>`;
+                            cropList.appendChild(listItem);
+                        }
+                    });
+                }
+            });
+
+            // Remove crop from registered crops
+            cropList.addEventListener('click', function(event) {
+                if (event.target.classList.contains('delete-btn')) {
+                    const cropName = event.target.getAttribute('data-crop');
+                    const category = event.target.getAttribute('data-category');
+                    
+                    fetch('/crops/remove-crop', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ category: category, crop_name: cropName })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            event.target.parentElement.remove();
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
