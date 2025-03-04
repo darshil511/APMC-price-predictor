@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, request, url_for, flash, session, make_response
+from flask import Blueprint, render_template, redirect, request, url_for, flash, jsonify, session, make_response
 from flask_login import login_user, logout_user, login_required, current_user
 from models import db, User
 
@@ -70,3 +70,19 @@ def logout():
 @login_required
 def profile():
     return render_template('profile.html', user=current_user)
+
+#updating user name
+@auth_bp.route('/update-name', methods=['POST'])
+@login_required
+def update_name():
+    data = request.get_json()
+    new_name = data.get("name")
+    
+    if not new_name or new_name.strip() == "":
+        return jsonify({"success": False, "message": "Name cannot be empty."}), 400
+
+    current_user.name = new_name.strip()
+    db.session.commit()
+
+    flash('Name updated successfully!', 'success')
+    return jsonify({"success": True, "message": "Name updated successfully!"})

@@ -4,38 +4,94 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile | APMC Price Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style_profile.css') }}">
 </head>
 <body>
-    <div class="profile-container">
-        <h2>{{ current_user.name }}</h2>
-        <h3>Registered Crops</h3>
-        <ul id="crop-list">
-            {% if user_crops %}
-                {% for crop in user_crops %}
-                    <li>{{ crop.category }} - {{ crop.crop_name }} <button class="delete-btn" data-crop="{{ crop.crop_name }}" data-category="{{ crop.category }}">Remove</button></li>
-                {% endfor %}
-            {% else %}
-                <p>No crops registered.</p>
-            {% endif %}
-        </ul>
-        
-        <h3>Add New Crop</h3>
-        <label for="category">Select Category:</label>
-        <select id="category">
-            <option value="" disabled selected>Select category</option>
-            <option value="Commodities">જણસી</option>
-            <option value="Fruits">ફળ</option>
-            <option value="Vegetables">શાકભાજી</option>
-        </select>
-        
-        <label for="crop">Select Crop:</label>
-        <select id="crop">
-            <option value="">--Select Crop--</option>
-        </select>
-        
-        <button id="add-crop-btn">Add Crop</button>
-        <a class="back-button" href="/">Go Back</a>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="category">Select Category:</label>
+                <select id="category" class="form-select mb-2">
+                    <option value="" disabled selected>Select category</option>
+                    <option value="Commodities">જણસી</option>
+                    <option value="Fruits">ફળ</option>
+                    <option value="Vegetables">શાકભાજી</option>
+                </select>
+                
+                <label for="crop">Select Crop:</label>
+                <select id="crop" class="form-select mb-2">
+                    <option value="">--Select Crop--</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button id="add-crop-btn" class="btn btn-outline-primary">Add Crop</button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row mt-4 mb-3">
+            <div class="name-container" id="name-container">
+                <button type="button" class="btn btn-outline-dark" onclick="window.location.href='/'">Go Back</button>
+                <h2>Profile</h2>
+                <!-- Display the current user's name -->
+                <label for="name">Name:</label>
+                <span type="text" id="display-name">{{ current_user.name }}</span>
+                <button id="update-name-btn" style="display: none;" class="btn btn-outline-primary mb-1">Update Name</button>
+                <button id="edit-name-btn" class="btn btn-outline-primary ms-3">Edit Name</button>
+                <button id="add-new-crop-btn" type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModalCenter" style="display: block; margin: auto;">Add Crop</button>
+                <p id="update-message" style="color: green;"></p>
+            </div>
+        </div>
+    
+        <div class="row mb-3">
+            <h3>Registered Crops</h3>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-sm view-crop-container">
+                <ul id="commodity-crop-list">
+                    {% if user_crops %}
+                        {% for crop in user_crops %}
+                            <li>{{ crop.category }} - {{ crop.crop_name }} <button type="button" class="btn btn-outline-danger" data-crop="{{ crop.crop_name }}" data-category="{{ crop.category }}">Remove</button></li>
+                        {% endfor %}
+                    {% else %}
+                        <p>No crops registered.</p>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="col-sm view-crop-container">
+                <ul id="fruits-crop-list">
+                    {% if user_crops %}
+                        {% for crop in user_crops %}
+                            <li>{{ crop.category }} - {{ crop.crop_name }} <button type="button" class="btn btn-outline-danger" data-crop="{{ crop.crop_name }}" data-category="{{ crop.category }}">Remove</button></li>
+                        {% endfor %}
+                    {% else %}
+                        <p>No crops registered.</p>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="col-sm view-crop-container">
+                <ul id="vegetable-crop-list">
+                    {% if user_crops %}
+                        {% for crop in user_crops %}
+                            <li>{{ crop.category }} - {{ crop.crop_name }} <button type="button" class="btn btn-outline-danger" data-crop="{{ crop.crop_name }}" data-category="{{ crop.category }}">Remove</button></li>
+                        {% endfor %}
+                    {% else %}
+                        <p>No crops registered.</p>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
     </div>
 
     {% with messages=get_flashed_messages(with_categories=True) %}
@@ -46,22 +102,59 @@
       {% endif %}
     {% endwith %}
     
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        window.addEventListener('load', function () {
-            const alerts = document.querySelectorAll('.alert')
-          
-            // Show alert for a certain amount of time
-            alerts.forEach(function (alert) {
-              alert.classList.add('show') // Show the alert with animation
-          
-              // Automatically hide the alert after 5 seconds (or adjust timing)
-              setTimeout(function () {
-                alert.classList.remove('show') // Hide with animation
-                alert.classList.add('hide') // Add the hide class after the show
-                setTimeout(() => alert.remove(), 1000)
-              }, 5000) // Keep the alert visible for 5 seconds
+        document.getElementById('edit-name-btn').addEventListener('click', function() {
+            let newInput = document.createElement('input');
+            newInput.type = 'text';
+            newInput.id = 'name';
+            newInput.value = '{{ current_user.name }}';
+            newInput.className = "form-control mb-2 me-3 w-auto";
+            let parentContainer = document.getElementById('name-container'); 
+            let updateButton = document.getElementById('update-name-btn');
+            parentContainer.insertBefore(newInput, updateButton);
+
+            // Show the input field and update button
+            document.getElementById('name').style.display = 'inline-block';  // Show input field
+            document.getElementById('update-name-btn').style.display = 'inline-block'; // Show update button
+            document.getElementById('display-name').style.display = 'none'; // Hide the displayed name
+            document.getElementById('edit-name-btn').style.display = 'none'; // Hide the edit button
+        });
+
+
+        // updating user name
+        document.getElementById("update-name-btn").addEventListener("click", function () {
+            const newName = document.getElementById("name").value.trim();
+            if (newName === "") {
+                alert("Name cannot be empty!");
+                return;
+            }
+    
+            fetch("/auth/update-name", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name: newName })
             })
-          })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("update-message").textContent = data.message;
+                    document.getElementById('display-name').textContent = newName;
+                    document.getElementById('display-name').style.display = 'inline-block';
+                    document.getElementById('name').remove();
+                    document.getElementById('update-name-btn').style.display = 'none';
+                    document.getElementById('edit-name-btn').style.display = 'inline-block';
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+
+        // to get the updated list of products
         document.addEventListener('DOMContentLoaded', function() {
             const categoryDropdown = document.getElementById('category');
             const cropDropdown = document.getElementById('crop');
@@ -96,17 +189,34 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const cropList = document.getElementById('crop-list');
-                    cropList.innerHTML = ''; // Clear the list before adding items
+                    // Get the list elements for each category
+                    const vegetableList = document.getElementById('vegetable-crop-list');
+                    const fruitList = document.getElementById('fruits-crop-list');
+                    const commodityList = document.getElementById('commodity-crop-list');
+
+                    // Clear existing content
+                    vegetableList.innerHTML = '';
+                    fruitList.innerHTML = '';
+                    commodityList.innerHTML = '';
 
                     if (data.crops.length === 0) {
-                        cropList.innerHTML = '<li>No crops registered.</li>';
+                        vegetableList.innerHTML = '<li>No vegetables registered.</li>';
+                        fruitList.innerHTML = '<li>No fruits registered.</li>';
+                        commodityList.innerHTML = '<li>No commodities registered.</li>';
                     } else {
                         data.crops.forEach(crop => {
                             const listItem = document.createElement('li');
                             listItem.innerHTML = `${crop.category} - ${crop.crop_name} 
-                                <button class="delete-btn" data-crop="${crop.crop_name}" data-category="${crop.category}">Remove</button>`;
-                            cropList.appendChild(listItem);
+                                <button class="btn btn-outline-danger" data-crop="${crop.crop_name}" data-category="${crop.category}">Remove</button>`;
+
+                            // Append to the correct category list
+                            if (crop.category === "Vegetables") {
+                                vegetableList.appendChild(listItem);
+                            } else if (crop.category === "Fruits") {
+                                fruitList.appendChild(listItem);
+                            } else if (crop.category === "Commodities") {
+                                commodityList.appendChild(listItem);
+                            }
                         });
                     }
                 }
@@ -128,19 +238,26 @@
                     .then(data => {
                         if (data.success) {
                             const listItem = document.createElement('li');
-                            listItem.innerHTML = `${category} - ${crop} <button class="delete-btn" data-crop="${crop}" data-category="${category}">Remove</button>`;
-                            cropList.appendChild(listItem);
+                            listItem.innerHTML = `${category} - ${crop} <button class="btn btn-outline-danger" data-crop="${crop}" data-category="${category}">Remove</button>`;
+                            // Append to the correct category list
+                            if (category === "Vegetables") {
+                                document.getElementById('vegetable-crop-list').appendChild(listItem);
+                            } else if (category === "Fruits") {
+                                document.getElementById('fruits-crop-list').appendChild(listItem);
+                            } else if (category === "Commodities") {
+                                document.getElementById('commodity-crop-list').appendChild(listItem);
+                            }
                         }
                     });
                 }
             });
 
             // Remove crop from registered crops
-            cropList.addEventListener('click', function(event) {
-                if (event.target.classList.contains('delete-btn')) {
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('btn-outline-danger')) {
                     const cropName = event.target.getAttribute('data-crop');
                     const category = event.target.getAttribute('data-category');
-                    
+
                     fetch('/crops/remove-crop', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -151,10 +268,28 @@
                         if (data.success) {
                             event.target.parentElement.remove();
                         }
-                    });
+                    })
+                    .catch(error => console.error('Error removing crop:', error));
                 }
             });
         });
+
+        // flash messages
+        window.addEventListener('load', function () {
+            const alerts = document.querySelectorAll('.alert')
+          
+            // Show alert for a certain amount of time
+            alerts.forEach(function (alert) {
+              alert.classList.add('show') // Show the alert with animation
+          
+              // Automatically hide the alert after 5 seconds (or adjust timing)
+              setTimeout(function () {
+                alert.classList.remove('show') // Hide with animation
+                alert.classList.add('hide') // Add the hide class after the show
+                setTimeout(() => alert.remove(), 1000)
+              }, 5000) // Keep the alert visible for 5 seconds
+            })
+          })
     </script>
 </body>
 </html>
