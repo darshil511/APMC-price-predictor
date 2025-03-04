@@ -1,52 +1,49 @@
 /* General Page Styles */
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    /* display: flex;
+    justify-content: center; */
 }
 
-.container {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 400px;
-    text-align: center;
+.name-container {
+    /* position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-bottom: 1px solid #ccc; */
+    /* background-color: #e9ecef; */
+    z-index: 1000; 
 }
+
+.crop-container {
+    /* position: fixed;
+    top: 180px; 
+    left: 0;
+    width: 200px; 
+    height: calc(100% - 50px);  */
+    background-color: #e9ecef;
+    /* padding: 10px;
+    border-right: 1px solid #ccc; */
+}
+
+.view-crop-container {
+    /* margin-left: 200px; 
+    margin-top: 170px; 
+    padding: 10px;
+    height: calc(100vh - 50px); 
+    overflow-y: auto;  */
+    background-color: #ffffff;
+}
+
 
 h2 {
     color: #333;
 }
 
-/* Registered Crops List */
-.crops-container {
-    margin-top: 20px;
-    padding: 10px;
-    background: #e8f5e9;
-    border-radius: 8px;
-}
-
-.crops-container ul {
-    list-style: none;
-    padding: 0;
-}
-
-.crops-container li {
-    display: flex;
-    justify-content: space-between;
-    background: #d4edda;
-    margin: 5px 0;
-    padding: 10px;
-    border-radius: 5px;
-}
-
 /* Dropdown & Buttons */
-select,
+/* select,
 button {
     width: 100%;
     padding: 10px;
@@ -65,27 +62,39 @@ button {
 
 button:hover {
     background: #218838;
+} */
+
+
+
+.btn-outline-dark{
+    float: right;
+    border-color: #f8f9fa;
+}
+.btn-outline-dark:hover{
+    background-color: #218838;
+    border-color: #218838;
 }
 
-/* Remove Button */
-.remove-btn {
-    background: #dc3545;
+.btn-outline-primary{
     color: white;
-    border: none;
-    padding: 5px 10px;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 5px;
+    background-color: #28a745;
+    border-color: #28a745;
+}
+.btn-outline-primary:hover{
+    background-color: #218838;
+    border-color: #218838;
+}
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    background-color: #28a745 !important;
 }
 
-.remove-btn:hover {
-    background: #c82333;
-}
-
-.back-button {
-    margin-left: 46%;
+/* .back-button {
     text-decoration: underline;
-}
+    float: right;
+    margin-right: 15px;
+    margin-top: 5px;
+} */
 
 
 /* General styles for the alert */
