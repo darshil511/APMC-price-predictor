@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style_profile.css') }}">
 </head>
 <body>
+    <div id="alert-container"></div>
     <!-- Modal -->
     <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -128,7 +129,7 @@
             let newInput = document.createElement('input');
             newInput.type = 'text';
             newInput.id = 'name';
-            newInput.value = '{{ current_user.name }}';
+            newInput.value = document.getElementById('display-name').textContent;
             newInput.className = "form-control mb-2 me-3 w-auto";
             let parentContainer = document.getElementById('name-container'); 
             let updateButton = document.getElementById('update-name-btn');
@@ -160,7 +161,8 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById("update-message").textContent = data.message;
+                    //document.getElementById("update-message").textContent = data.message;
+                    showAlert('success', 'Name update successfully!')
                     document.getElementById('display-name').textContent = newName;
                     document.getElementById('display-name').style.display = 'inline-block';
                     document.getElementById('name').remove();
@@ -297,8 +299,11 @@
                                 document.getElementById('no-commodities-msg')?.remove();
                                 commodityList.appendChild(listItem);
                             }
+                        } else {
+                            showAlert('warning', 'Crop already exist!')
                         }
-                    });
+                    })
+                    .catch(error => console.error('Crop already exist!', error));
                 }
             });
 
@@ -346,22 +351,22 @@
             });
         });
 
-        // flash messages
-        window.addEventListener('load', function () {
-            const alerts = document.querySelectorAll('.alert')
-          
-            // Show alert for a certain amount of time
-            alerts.forEach(function (alert) {
-              alert.classList.add('show') // Show the alert with animation
-          
-              // Automatically hide the alert after 5 seconds (or adjust timing)
-              setTimeout(function () {
-                alert.classList.remove('show') // Hide with animation
-                alert.classList.add('hide') // Add the hide class after the show
-                setTimeout(() => alert.remove(), 1000)
-              }, 5000) // Keep the alert visible for 5 seconds
-            })
-          });
+        // alert messages
+        function showAlert(type, message) {
+            // Create a new alert element
+            const alert = document.createElement('div');
+            alert.classList.add('alert', `alert-${type}`, 'alert-dismissible', 'fade', 'show');
+            alert.setAttribute('role', 'alert');
+            alert.innerHTML = `${message}`;
+            
+            // Append the alert to the alert container
+            document.getElementById('alert-container').appendChild(alert);
+            
+            // Optionally, remove the alert after a certain time
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 3000);
+        }
     </script>
 </body>
 </html>
