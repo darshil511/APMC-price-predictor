@@ -1,6 +1,6 @@
 /* General Page Styles */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Arial', sans-serif
     /* display: flex;
     justify-content: center; */
 }
@@ -34,7 +34,8 @@ body {
     padding: 10px;
     height: calc(100vh - 50px); 
     overflow-y: auto;  */
-    background-color: #ffffff;
+    background-color: #e9ecef;
+    border-radius: 3%;
 }
 
 
@@ -64,8 +65,9 @@ button:hover {
     background: #218838;
 } */
 
-
-
+.btn-outline-danger{
+    border-color: #e9ecef;
+}
 .btn-outline-dark{
     float: right;
     border-color: #f8f9fa;

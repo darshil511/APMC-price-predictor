@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile | APMC Price Predictor</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style_profile.css') }}">
 </head>
 <body>
@@ -31,8 +33,7 @@
                 </select>
             </div>
             <div class="modal-footer">
-                <button id="add-crop-btn" class="btn btn-outline-primary">Add Crop</button>
-                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+                <button id="add-crop-btn" class="btn btn-outline-primary" data-bs-dismiss="modal">Add Crop</button>
             </div>
         </div>
         </div>
@@ -41,50 +42,61 @@
     <div class="container">
         <div class="row mt-4 mb-3">
             <div class="name-container" id="name-container">
-                <button type="button" class="btn btn-outline-dark" onclick="window.location.href='/'">Go Back</button>
+                <button type="button" class="btn btn-outline-dark me-5" onclick="window.location.href='/'">Go Back</button>
                 <h2>Profile</h2>
                 <!-- Display the current user's name -->
                 <label for="name">Name:</label>
                 <span type="text" id="display-name">{{ current_user.name }}</span>
-                <button id="update-name-btn" style="display: none;" class="btn btn-outline-primary mb-1">Update Name</button>
-                <button id="edit-name-btn" class="btn btn-outline-primary ms-3">Edit Name</button>
-                <button id="add-new-crop-btn" type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModalCenter" style="display: block; margin: auto;">Add Crop</button>
+                <i id="update-name-btn" class="bi bi-check2-circle" style="display: none; cursor: pointer; color: #28a745;"></i>
+                <i id="edit-name-btn" class="bi bi-pencil-square ms-2" style="cursor: pointer; color: #28a745;"></i>
+                <!-- <button id="add-new-crop-btn" type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModalCenter" style="display: block; margin: auto;">Add Crop</button>-->
                 <p id="update-message" style="color: green;"></p>
             </div>
         </div>
     
-        <div class="row mb-3">
-            <h3>Registered Crops</h3>
+        <div class="row align-items-center mb-3">
+            <div class="col-auto">
+                <h3>Registered Crops</h3>
+            </div>
+            <div class="col-auto ms-auto">
+                <button id="add-new-crop-btn" type="button" class="btn btn-outline-primary me-5" data-bs-toggle="modal" data-bs-target="#exampleModalCenter">
+                    Add Crop
+                </button>
+            </div>
         </div>
+        
 
         <div class="row mb-3">
-            <div class="col-sm view-crop-container">
+            <div class="col-sm view-crop-container p-3">
+                <h5 style="display: flex; justify-content: center;">જણસી</h5>
                 <ul id="commodity-crop-list">
                     {% if user_crops %}
                         {% for crop in user_crops %}
-                            <li>{{ crop.category }} - {{ crop.crop_name }} <button type="button" class="btn btn-outline-danger" data-crop="{{ crop.crop_name }}" data-category="{{ crop.category }}">Remove</button></li>
+                            <li>{{ crop.category }} - {{ crop.crop_name }} <i class="bi bi-x-lg ms-2" data-crop="${crop.crop_name}" data-category="${crop.category}" style="cursor: pointer; color: red;"></i></li>
                         {% endfor %}
                     {% else %}
                         <p>No crops registered.</p>
                     {% endif %}
                 </ul>
             </div>
-            <div class="col-sm view-crop-container">
+            <div class="col-sm view-crop-container ms-2 p-3">
+                <h5 style="display: flex; justify-content: center;">ફળ</h5>
                 <ul id="fruits-crop-list">
                     {% if user_crops %}
                         {% for crop in user_crops %}
-                            <li>{{ crop.category }} - {{ crop.crop_name }} <button type="button" class="btn btn-outline-danger" data-crop="{{ crop.crop_name }}" data-category="{{ crop.category }}">Remove</button></li>
+                            <li>{{ crop.category }} - {{ crop.crop_name }} <i class="bi bi-x-lg ms-2" data-crop="${crop.crop_name}" data-category="${crop.category}" style="cursor: pointer; color: red;"></i></li>
                         {% endfor %}
                     {% else %}
                         <p>No crops registered.</p>
                     {% endif %}
                 </ul>
             </div>
-            <div class="col-sm view-crop-container">
+            <div class="col-sm view-crop-container ms-2 p-3">
+                <h5 style="display: flex; justify-content: center;">શાકભાજી</h5>
                 <ul id="vegetable-crop-list">
                     {% if user_crops %}
                         {% for crop in user_crops %}
-                            <li>{{ crop.category }} - {{ crop.crop_name }} <button type="button" class="btn btn-outline-danger" data-crop="{{ crop.crop_name }}" data-category="{{ crop.category }}">Remove</button></li>
+                            <li>{{ crop.category }} - {{ crop.crop_name }} <i class="bi bi-x-lg ms-2" data-crop="${crop.crop_name}" data-category="${crop.category}" style="cursor: pointer; color: red;"></i></li>
                         {% endfor %}
                     {% else %}
                         <p>No crops registered.</p>
@@ -105,6 +117,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // code for disappearing the data in modal body when the modal closes
+        document.getElementById('exampleModalCenter').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('category').value = "";  // Reset category dropdown
+            document.getElementById('crop').innerHTML = '<option value="">--Select Crop--</option>'; // Reset crop dropdown
+        });        
+
+        //code for edit-name button
         document.getElementById('edit-name-btn').addEventListener('click', function() {
             let newInput = document.createElement('input');
             newInput.type = 'text';
@@ -123,18 +142,18 @@
         });
 
 
-        // updating user name
+        // updating user name    
         document.getElementById("update-name-btn").addEventListener("click", function () {
             const newName = document.getElementById("name").value.trim();
             if (newName === "") {
                 alert("Name cannot be empty!");
                 return;
             }
-    
+        
             fetch("/auth/update-name", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                   "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ name: newName })
             })
@@ -199,25 +218,47 @@
                     fruitList.innerHTML = '';
                     commodityList.innerHTML = '';
 
-                    if (data.crops.length === 0) {
-                        vegetableList.innerHTML = '<li>No vegetables registered.</li>';
-                        fruitList.innerHTML = '<li>No fruits registered.</li>';
-                        commodityList.innerHTML = '<li>No commodities registered.</li>';
-                    } else {
-                        data.crops.forEach(crop => {
-                            const listItem = document.createElement('li');
-                            listItem.innerHTML = `${crop.category} - ${crop.crop_name} 
-                                <button class="btn btn-outline-danger" data-crop="${crop.crop_name}" data-category="${crop.category}">Remove</button>`;
+                    // Track if any crops exist in each category
+                    let hasVegetables = false;
+                    let hasFruits = false;
+                    let hasCommodities = false;
 
-                            // Append to the correct category list
-                            if (crop.category === "Vegetables") {
-                                vegetableList.appendChild(listItem);
-                            } else if (crop.category === "Fruits") {
-                                fruitList.appendChild(listItem);
-                            } else if (crop.category === "Commodities") {
-                                commodityList.appendChild(listItem);
-                            }
-                        });
+                    // Populate the lists
+                    data.crops.forEach(crop => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `${crop.crop_name} 
+                            <i class="bi bi-x-lg ms-2" data-crop="${crop.crop_name}" data-category="${crop.category}" style="cursor: pointer; color: red;"></i>`;
+
+                        if (crop.category === "Vegetables") {
+                            vegetableList.appendChild(listItem);
+                            hasVegetables = true;
+                        } else if (crop.category === "Fruits") {
+                            fruitList.appendChild(listItem);
+                            hasFruits = true;
+                        } else if (crop.category === "Commodities") {
+                            commodityList.appendChild(listItem);
+                            hasCommodities = true;
+                        }
+                    });
+
+                    // Add placeholder message if a category is empty
+                    if (!hasVegetables) {
+                        const noVegetableMsg = document.createElement('li');
+                        noVegetableMsg.id = 'no-vegetables-msg';
+                        noVegetableMsg.innerText = 'No vegetables registered.';
+                        vegetableList.appendChild(noVegetableMsg);
+                    }
+                    if (!hasFruits) {
+                        const noFruitMsg = document.createElement('li');
+                        noFruitMsg.id = 'no-fruits-msg';
+                        noFruitMsg.innerText = 'No fruits registered.';
+                        fruitList.appendChild(noFruitMsg);
+                    }
+                    if (!hasCommodities) {
+                        const noCommodityMsg = document.createElement('li');
+                        noCommodityMsg.id = 'no-commodities-msg';
+                        noCommodityMsg.innerText = 'No commodities registered.';
+                        commodityList.appendChild(noCommodityMsg);
                     }
                 }
             })
@@ -237,15 +278,24 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            const listItem = document.createElement('li');
-                            listItem.innerHTML = `${category} - ${crop} <button class="btn btn-outline-danger" data-crop="${crop}" data-category="${category}">Remove</button>`;
+                            const listItem = document.createElement('li'); 
+                            listItem.innerHTML = `${crop} <i class="bi bi-x-lg ms-2" data-crop="${crop}" data-category="${category}" style="cursor: pointer; color: red;"></i>`;
+                            
+                            const vegetableList = document.getElementById('vegetable-crop-list');
+                            const fruitList = document.getElementById('fruits-crop-list');
+                            const commodityList = document.getElementById('commodity-crop-list');
+
+
                             // Append to the correct category list
                             if (category === "Vegetables") {
-                                document.getElementById('vegetable-crop-list').appendChild(listItem);
+                                document.getElementById('no-vegetables-msg')?.remove();
+                                vegetableList.appendChild(listItem);
                             } else if (category === "Fruits") {
-                                document.getElementById('fruits-crop-list').appendChild(listItem);
+                                document.getElementById('no-fruits-msg')?.remove();
+                                fruitList.appendChild(listItem);
                             } else if (category === "Commodities") {
-                                document.getElementById('commodity-crop-list').appendChild(listItem);
+                                document.getElementById('no-commodities-msg')?.remove();
+                                commodityList.appendChild(listItem);
                             }
                         }
                     });
@@ -254,7 +304,7 @@
 
             // Remove crop from registered crops
             document.addEventListener('click', function(event) {
-                if (event.target.classList.contains('btn-outline-danger')) {
+                if (event.target.classList.contains('bi-x-lg')) {
                     const cropName = event.target.getAttribute('data-crop');
                     const category = event.target.getAttribute('data-category');
 
@@ -267,6 +317,28 @@
                     .then(data => {
                         if (data.success) {
                             event.target.parentElement.remove();
+                            const vegetableList = document.getElementById('vegetable-crop-list');
+                            const fruitList = document.getElementById('fruits-crop-list');
+                            const commodityList = document.getElementById('commodity-crop-list');
+
+                            if (commodityList.children.length === 0) {
+                                const noCommodityMsg = document.createElement('li');
+                                noCommodityMsg.id = 'no-commodities-msg';
+                                noCommodityMsg.innerText = 'No commodities registered.';
+                                commodityList.appendChild(noCommodityMsg);
+                            }
+                            if (fruitList.children.length === 0) {
+                                const noFruitMsg = document.createElement('li');
+                                noFruitMsg.id = 'no-fruits-msg';
+                                noFruitMsg.innerText = 'No fruits registered.';
+                                fruitList.appendChild(noFruitMsg);
+                            }
+                            if (vegetableList.children.length === 0) {
+                                const noVegetableMsg = document.createElement('li');
+                                noVegetableMsg.id = 'no-vegetables-msg';
+                                noVegetableMsg.innerText = 'No vegetables registered.';
+                                vegetableList.appendChild(noVegetableMsg);
+                            }
                         }
                     })
                     .catch(error => console.error('Error removing crop:', error));
@@ -289,7 +361,7 @@
                 setTimeout(() => alert.remove(), 1000)
               }, 5000) // Keep the alert visible for 5 seconds
             })
-          })
+          });
     </script>
 </body>
 </html>
