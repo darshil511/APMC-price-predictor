@@ -1,108 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>APMC Price Predictor</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_index.css') }}" />
-  </head>
-  <body>
-    <div class="topnav">
-      <a class="active" href="/">Home</a>
-      <a href="/">About</a>
-      <a href="/">Contact</a>
-      <div class="login-container">
-        {% if current_user.is_authenticated %}
-          <li class="profile">
-            <a href="{{ url_for('auth.profile') }}">
-              <img src="{{ url_for('static', filename='images/profile_icon.png') }}" alt="Profile" class="profile-icon" />
-              {{ current_user.name }}
-            </a>
-            <form action="/auth/logout" method="POST">
-              <button type="submit">Logout</button>
-            </form>
-          </li>
-        {% else %}
-          <form action="/auth/login" method="GET">
-            <button type="submit">Login</button>
-          </form>
-        {% endif %}
-      </div>
-    </div>
-    <h1 id="heading">Welcome to APMC Price Predictor!</h1>
-    <form id="inputs" action="/predict" method="POST">
-      <h2><label for="category">Category:</label></h2>
-      <select name="category" id="category">
-        <option value="" disabled selected>Select category</option>
-        <option value="Commodities">જણસી</option>
-        <option value="Fruits">ફળ</option>
-        <option value="Vegetables">શાકભાજી</option>
-      </select>
-      <br />
-      <h2><label for="product">Select a product:</label></h2>
-      <select id="product" name="product">
-        <option value="" disabled selected>Choose a product</option>
-      </select>
+{% extends 'base.html' %}
 
-      <br />
-      <button type="submit">Predict</button>
-    </form>
+{% block title %}
+  APMC Price Predictor
+{% endblock %}
 
-    {% with messages=get_flashed_messages(with_categories=True) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+{% block content %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style_index.css') }}" />
+  <h1 id="heading">Welcome to APMC Price Predictor!</h1>
+  <form id="inputs" action="/predict" method="POST">
+    <h2><label for="category">Category:</label></h2>
+    <select name="category" id="category">
+      <option value="" disabled selected>Select category</option>
+      <option value="Commodities">જણસી</option>
+      <option value="Fruits">ફળ</option>
+      <option value="Vegetables">શાકભાજી</option>
+    </select>
+    <br />
+    <h2><label for="product">Select a product:</label></h2>
+    <select id="product" name="product">
+      <option value="" disabled selected>Choose a product</option>
+    </select>
 
-    <script>
-      const category = document.getElementById('category')
-      const product = document.getElementById('product')
-      
-      category.addEventListener('change', function () {
-        product.innerHTML = '<option value="" disabled selected>Choose a product</option>'
-      
-        const selectedValue = this.value
-        if (selectedValue) {
-          // Send request to backend
-          fetch('/get-products', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ category: selectedValue })
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.products && data.products.length > 0) {
-                data.products.forEach(function (productName) {
-                  const option = document.createElement('option')
-                  option.value = productName
-                  option.textContent = productName
-                  product.appendChild(option)
-                })
-              } else {
-                console.log('No products found')
-              }
-            })
-            .catch((error) => console.error('Error fetching products:', error))
-        }
-      })
-      
-      window.addEventListener('load', function () {
-        const alerts = document.querySelectorAll('.alert')
-      
-        // Show alert for a certain amount of time
-        alerts.forEach(function (alert) {
-          alert.classList.add('show') // Show the alert with animation
-      
-          // Automatically hide the alert after 5 seconds (or adjust timing)
-          setTimeout(function () {
-            alert.classList.remove('show') // Hide with animation
-            alert.classList.add('hide') // Add the hide class after the show
-            setTimeout(() => alert.remove(), 1000)
-          }, 5000) // Keep the alert visible for 5 seconds
+    <br />
+    <button type="submit">Predict</button>
+  </form>
+
+  <script>
+    const category = document.getElementById('category')
+    const product = document.getElementById('product')
+    
+    category.addEventListener('change', function () {
+      product.innerHTML = '<option value="" disabled selected>Choose a product</option>'
+    
+      const selectedValue = this.value
+      if (selectedValue) {
+        // Send request to backend
+        fetch('/get-products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ category: selectedValue })
         })
-      })
-    </script>
-  </body>
-</html>
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.products && data.products.length > 0) {
+              data.products.forEach(function (productName) {
+                const option = document.createElement('option')
+                option.value = productName
+                option.textContent = productName
+                product.appendChild(option)
+              })
+            } else {
+              console.log('No products found')
+            }
+          })
+          .catch((error) => console.error('Error fetching products:', error))
+      }
+    })
+  </script>
+{% endblock %}

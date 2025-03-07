@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, request, url_for, flash, jsonify, session, make_response
+from flask import Blueprint, render_template, redirect, request, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from models import db, User
 
@@ -16,8 +16,7 @@ def register():
         # Check if user already exists
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
-            flash('Email already registered. Please log in.', 'danger')
-            return redirect(url_for('auth.login'))
+            return jsonify({'status': 'error', 'message': 'Email already registered. Please log in.'}), 400
 
         # Create new user
         new_user = User(name=name, email=email, phone_number=phone_number)
@@ -25,8 +24,8 @@ def register():
 
         db.session.add(new_user)
         db.session.commit()
-        flash('Registration successful! Please log in.', 'success')
-        return redirect(url_for('auth.login'))
+        
+        return jsonify({'status': 'success', 'message': 'Registration successful! Please log in.'}), 201
 
     return render_template('register.html')
 
@@ -39,31 +38,21 @@ def login():
 
         user = User.query.filter_by(email=email).first()
         if not user:
-            flash('User not found!', 'danger')
-            return render_template('register.html')
+            return jsonify({'status': 'error', 'message': 'User not found!'}), 400
         if user and user.check_password(password):
             login_user(user)
-            flash('Login successful!', 'success')
-            return redirect(url_for('home'))
+            return jsonify({'status': 'success', 'message': 'Login successful!'}), 200
 
-        flash('Invalid email or password.', 'danger')
-        return redirect(url_for('auth.login'))
-
-    # return "Hello worls"   
+        return jsonify({'status': 'error', 'message': 'Invalid email or password.'}), 400
+ 
     return render_template('login.html')
 
 # User Logout
 @auth_bp.route('/logout', methods=['POST'])
 @login_required
 def logout():
-    # resp = make_response(redirect(url_for('auth.login')))
-    # resp.set_cookie('session', '', expires=0)  # Setting a cookie to expire immediately
-    
-    # # Also clear the session data
-    # session.clear()
     logout_user()
-    flash('You have been logged out.', 'success')
-    return redirect(url_for('home'))
+    return jsonify({'status': 'success', 'message': 'You have been logged out.'}), 200
 
 
 @auth_bp.route('/profile')
@@ -84,5 +73,4 @@ def update_name():
     current_user.name = new_name.strip()
     db.session.commit()
 
-    flash('Name updated successfully!', 'success')
     return jsonify({"success": True, "message": "Name updated successfully!"})

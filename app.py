@@ -108,6 +108,9 @@ def get_products():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/base")
+def base():
+    return render_template("base.html")
 
 @app.route("/")
 def home():

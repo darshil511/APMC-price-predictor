@@ -1,58 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_auth.css') }}" />
-    <title>Login | APMC Price Predictor</title>
-  </head>
-  <body>
-    <div class="login-container">
-      <h2>Login</h2>
-      <form action="{{ url_for('auth.login') }}" method="POST">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required />
+{% extends 'base.html' %}
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required />
+{% block title %}
+  Login | APMC Price Predictor
+{% endblock %}
 
-        <button type="submit">Login</button>
-      </form>
-      <p>
-        Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a>
-      </p>
-    </div>
+{% block content %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style_auth.css') }}" />
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="login-form" method="POST">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required />
 
-    {% with messages=get_flashed_messages(with_categories=True) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required />
 
-    <script>
-        // Generate a random number between 1 and 10
-        const randomImageNumber = Math.floor(Math.random() * 10) + 1;
-        
-        // Set the background image dynamically
-        document.body.style.backgroundImage = `url('{{ url_for('static', filename='images/image_' + 'REPLACE' + '.jpg') }}`.replace('REPLACE', randomImageNumber);
+      <button type="submit">Login</button>
+    </form>
+    <p>
+      Don't have an account? <a href="{{ url_for('auth.register') }}">Register here</a>
+    </p>
+  </div>
 
-        window.addEventListener('load', function () {
-            const alerts = document.querySelectorAll('.alert');
-            
-            // Show alert for a certain amount of time
-            alerts.forEach(function (alert) {
-                alert.classList.add('show'); // Show the alert with animation
-                
-                // Automatically hide the alert after 5 seconds (or adjust timing)
-                setTimeout(function () {
-                    alert.classList.remove('show'); // Hide with animation
-                    alert.classList.add('hide'); // Add the hide class after the show
-                    setTimeout(() => alert.remove(), 1000);
-                }, 5000); // Keep the alert visible for 5 seconds
-            });
-        });
-    </script>
-  </body>
-</html>
+  <script>
+    // Generate a random number between 1 and 10
+    const randomImageNumber = Math.floor(Math.random() * 10) + 1
+    
+    // Set the background image dynamically
+    document.body.style.backgroundImage = `url('{{ url_for('static', filename='images/image_' + 'REPLACE' + '.jpg') }}`.replace('REPLACE', randomImageNumber)
+    
+    window.addEventListener('load', function () {
+      const alerts = document.querySelectorAll('.alert')
+    
+      // Show alert for a certain amount of time
+      alerts.forEach(function (alert) {
+        alert.classList.add('show') // Show the alert with animation
+    
+        // Automatically hide the alert after 5 seconds (or adjust timing)
+        setTimeout(function () {
+          alert.classList.remove('show') // Hide with animation
+          alert.classList.add('hide') // Add the hide class after the show
+          setTimeout(() => alert.remove(), 1000)
+        }, 5000) // Keep the alert visible for 5 seconds
+      })
+    })
+    
+    document.getElementById('login-form').addEventListener('submit', function (event) {
+      event.preventDefault()
+    
+      const email = document.getElementById('email').value
+      const password = document.getElementById('password').value
+    
+      fetch('/auth/login', {
+        method: 'POST',
+        body: new URLSearchParams({
+          email: email,
+          password: password
+        }),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+        .then((response) => response.json()) // Parse the JSON response
+        .then((data) => {
+          if (data.status === 'success') {
+            localStorage.setItem('alertMessage', JSON.stringify({ type: 'success', message: 'Logged in successfully!' }))
+            window.location.href = '/'
+          } else if (data.message === 'Invalid email or password.') {
+            localStorage.setItem('alertMessage', JSON.stringify({ type: 'danger', message: data.message }))
+            window.location.href = '/auth/login'
+          } else if (data.message === 'User not found!') {
+            localStorage.setItem('alertMessage', JSON.stringify({ type: 'danger', message: data.message + ' Register here' }))
+            window.location.href = '/auth/register'
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error)
+        })
+    })
+  </script>
+{% endblock %}

@@ -1,372 +1,337 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile | APMC Price Predictor</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+{% extends 'base.html' %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_profile.css') }}">
-</head>
-<body>
-    <div id="alert-container"></div>
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <label for="category">Select Category:</label>
-                <select id="category" class="form-select mb-2">
-                    <option value="" disabled selected>Select category</option>
-                    <option value="Commodities">જણસી</option>
-                    <option value="Fruits">ફળ</option>
-                    <option value="Vegetables">શાકભાજી</option>
-                </select>
-                
-                <label for="crop">Select Crop:</label>
-                <select id="crop" class="form-select mb-2">
-                    <option value="">--Select Crop--</option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button id="add-crop-btn" class="btn btn-outline-primary" data-bs-dismiss="modal">Add Crop</button>
-            </div>
+{% block title %}
+  Profile | APMC Price Predictor
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_profile.css') }}">
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <div class="modal-body">
+            <label for="category">Select Category:</label>
+            <select id="category" class="form-select mb-2">
+                <option value="" disabled selected>Select category</option>
+                <option value="Commodities">જણસી</option>
+                <option value="Fruits">ફળ</option>
+                <option value="Vegetables">શાકભાજી</option>
+            </select>
+            
+            <label for="crop">Select Crop:</label>
+            <select id="crop" class="form-select mb-2">
+                <option value="">--Select Crop--</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button id="add-crop-btn" class="btn btn-outline-primary" data-bs-dismiss="modal">Add Crop</button>
+        </div>
+    </div>
+    </div>
+</div>
+
+    <div class="row mb-3">
+        <div class="name-container" id="name-container">    
+            <h2>Profile</h2>
+            <!-- Display the current user's name -->
+            <label for="name">Name:</label>
+            <span type="text" id="display-name">{{ current_user.name }}</span>
+            <i id="update-name-btn" class="bi bi-check2-circle" style="display: none; cursor: pointer; color: #28a745;"></i>
+            <i id="edit-name-btn" class="bi bi-pencil-square ms-2" style="cursor: pointer; color: #28a745;"></i>
+            <!-- <button id="add-new-crop-btn" type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModalCenter" style="display: block; margin: auto;">Add Crop</button>-->
+            <p id="update-message" style="color: green;"></p>
         </div>
     </div>
 
-    <div class="container">
-        <div class="row mt-4 mb-3">
-            <div class="name-container" id="name-container">
-                <button type="button" class="btn btn-outline-dark me-5" onclick="window.location.href='/'">Go Back</button>
-                <h2>Profile</h2>
-                <!-- Display the current user's name -->
-                <label for="name">Name:</label>
-                <span type="text" id="display-name">{{ current_user.name }}</span>
-                <i id="update-name-btn" class="bi bi-check2-circle" style="display: none; cursor: pointer; color: #28a745;"></i>
-                <i id="edit-name-btn" class="bi bi-pencil-square ms-2" style="cursor: pointer; color: #28a745;"></i>
-                <!-- <button id="add-new-crop-btn" type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModalCenter" style="display: block; margin: auto;">Add Crop</button>-->
-                <p id="update-message" style="color: green;"></p>
-            </div>
+    <div class="row align-items-center mb-3">
+        <div class="col-auto">
+            <h3>Registered Crops</h3>
         </div>
+        <div class="col-auto ms-auto">
+            <button id="add-new-crop-btn" type="button" class="btn btn-outline-primary me-5" data-bs-toggle="modal" data-bs-target="#exampleModalCenter">
+                Add Crop
+            </button>
+        </div>
+    </div>
     
-        <div class="row align-items-center mb-3">
-            <div class="col-auto">
-                <h3>Registered Crops</h3>
-            </div>
-            <div class="col-auto ms-auto">
-                <button id="add-new-crop-btn" type="button" class="btn btn-outline-primary me-5" data-bs-toggle="modal" data-bs-target="#exampleModalCenter">
-                    Add Crop
-                </button>
-            </div>
-        </div>
-        
 
-        <div class="row mb-3">
-            <div class="col-sm view-crop-container p-3">
-                <h5 style="display: flex; justify-content: center;">જણસી</h5>
-                <ul id="commodity-crop-list">
-                    {% if user_crops %}
-                        {% for crop in user_crops %}
-                            <li>{{ crop.category }} - {{ crop.crop_name }} <i class="bi bi-x-lg ms-2" data-crop="${crop.crop_name}" data-category="${crop.category}" style="cursor: pointer; color: red;"></i></li>
-                        {% endfor %}
-                    {% else %}
-                        <p>No crops registered.</p>
-                    {% endif %}
-                </ul>
-            </div>
-            <div class="col-sm view-crop-container ms-2 p-3">
-                <h5 style="display: flex; justify-content: center;">ફળ</h5>
-                <ul id="fruits-crop-list">
-                    {% if user_crops %}
-                        {% for crop in user_crops %}
-                            <li>{{ crop.category }} - {{ crop.crop_name }} <i class="bi bi-x-lg ms-2" data-crop="${crop.crop_name}" data-category="${crop.category}" style="cursor: pointer; color: red;"></i></li>
-                        {% endfor %}
-                    {% else %}
-                        <p>No crops registered.</p>
-                    {% endif %}
-                </ul>
-            </div>
-            <div class="col-sm view-crop-container ms-2 p-3">
-                <h5 style="display: flex; justify-content: center;">શાકભાજી</h5>
-                <ul id="vegetable-crop-list">
-                    {% if user_crops %}
-                        {% for crop in user_crops %}
-                            <li>{{ crop.category }} - {{ crop.crop_name }} <i class="bi bi-x-lg ms-2" data-crop="${crop.crop_name}" data-category="${crop.category}" style="cursor: pointer; color: red;"></i></li>
-                        {% endfor %}
-                    {% else %}
-                        <p>No crops registered.</p>
-                    {% endif %}
-                </ul>
-            </div>
+    <div class="row mb-3">
+        <div class="col-sm view-crop-container p-3">
+            <h5 style="display: flex; justify-content: center;">જણસી</h5>
+            <ul id="commodity-crop-list">
+                {% if user_crops %}
+                    {% for crop in user_crops %}
+                        <li>{{ crop.category }} - {{ crop.crop_name }} <i class="bi bi-x-lg ms-2" data-crop="${crop.crop_name}" data-category="${crop.category}" style="cursor: pointer; color: red;"></i></li>
+                    {% endfor %}
+                {% else %}
+                    <p>No commodities registered.</p>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="col-sm view-crop-container ms-2 p-3">
+            <h5 style="display: flex; justify-content: center;">ફળ</h5>
+            <ul id="fruits-crop-list">
+                {% if user_crops %}
+                    {% for crop in user_crops %}
+                        <li>{{ crop.category }} - {{ crop.crop_name }} <i class="bi bi-x-lg ms-2" data-crop="${crop.crop_name}" data-category="${crop.category}" style="cursor: pointer; color: red;"></i></li>
+                    {% endfor %}
+                {% else %}
+                    <p>No fruits registered.</p>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="col-sm view-crop-container ms-2 p-3">
+            <h5 style="display: flex; justify-content: center;">શાકભાજી</h5>
+            <ul id="vegetable-crop-list">
+                {% if user_crops %}
+                    {% for crop in user_crops %}
+                        <li>{{ crop.category }} - {{ crop.crop_name }} <i class="bi bi-x-lg ms-2" data-crop="${crop.crop_name}" data-category="${crop.category}" style="cursor: pointer; color: red;"></i></li>
+                    {% endfor %}
+                {% else %}
+                    <p>No vegetables registered.</p>
+                {% endif %}
+            </ul>
         </div>
     </div>
 
-    {% with messages=get_flashed_messages(with_categories=True) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-    
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // code for disappearing the data in modal body when the modal closes
-        document.getElementById('exampleModalCenter').addEventListener('hidden.bs.modal', function () {
-            document.getElementById('category').value = "";  // Reset category dropdown
-            document.getElementById('crop').innerHTML = '<option value="">--Select Crop--</option>'; // Reset crop dropdown
-        });        
+<script>
+    // code for disappearing the data in modal body when the modal closes
+    document.getElementById('exampleModalCenter').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('category').value = "";  // Reset category dropdown
+        document.getElementById('crop').innerHTML = '<option value="">--Select Crop--</option>'; // Reset crop dropdown
+    });        
 
-        //code for edit-name button
-        document.getElementById('edit-name-btn').addEventListener('click', function() {
-            let newInput = document.createElement('input');
-            newInput.type = 'text';
-            newInput.id = 'name';
-            newInput.value = document.getElementById('display-name').textContent;
-            newInput.className = "form-control mb-2 me-3 w-auto";
-            let parentContainer = document.getElementById('name-container'); 
-            let updateButton = document.getElementById('update-name-btn');
-            parentContainer.insertBefore(newInput, updateButton);
+    //code for edit-name button
+    document.getElementById('edit-name-btn').addEventListener('click', function() {
+        let newInput = document.createElement('input');
+        newInput.type = 'text';
+        newInput.id = 'name';
+        newInput.value = document.getElementById('display-name').textContent;
+        newInput.className = "form-control mb-2 me-3 w-auto";
+        let parentContainer = document.getElementById('name-container'); 
+        let updateButton = document.getElementById('update-name-btn');
+        parentContainer.insertBefore(newInput, updateButton);
 
-            // Show the input field and update button
-            document.getElementById('name').style.display = 'inline-block';  // Show input field
-            document.getElementById('update-name-btn').style.display = 'inline-block'; // Show update button
-            document.getElementById('display-name').style.display = 'none'; // Hide the displayed name
-            document.getElementById('edit-name-btn').style.display = 'none'; // Hide the edit button
-        });
+        // Show the input field and update button
+        document.getElementById('name').style.display = 'inline-block';  // Show input field
+        document.getElementById('update-name-btn').style.display = 'inline-block'; // Show update button
+        document.getElementById('display-name').style.display = 'none'; // Hide the displayed name
+        document.getElementById('edit-name-btn').style.display = 'none'; // Hide the edit button
+    });
 
 
-        // updating user name    
-        document.getElementById("update-name-btn").addEventListener("click", function () {
-            const newName = document.getElementById("name").value.trim();
-            if (newName === "") {
-                alert("Name cannot be empty!");
-                return;
-            }
-        
-            fetch("/auth/update-name", {
-                method: "POST",
-                headers: {
-                   "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ name: newName })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    //document.getElementById("update-message").textContent = data.message;
-                    showAlert('success', 'Name update successfully!')
-                    document.getElementById('display-name').textContent = newName;
-                    document.getElementById('display-name').style.display = 'inline-block';
-                    document.getElementById('name').remove();
-                    document.getElementById('update-name-btn').style.display = 'none';
-                    document.getElementById('edit-name-btn').style.display = 'inline-block';
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error("Error:", error));
-        });
-
-        // to get the updated list of products
-        document.addEventListener('DOMContentLoaded', function() {
-            const categoryDropdown = document.getElementById('category');
-            const cropDropdown = document.getElementById('crop');
-            const addCropBtn = document.getElementById('add-crop-btn');
-            const cropList = document.getElementById('crop-list');
-
-
-            // Fetch crops based on selected category
-            categoryDropdown.addEventListener('change', function() {
-                const selectedCategory = categoryDropdown.value;
-                cropDropdown.innerHTML = '<option value="">--Select Crop--</option>';
-                
-                if (selectedCategory) {
-                    fetch('/get-products', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ category: selectedCategory })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        data.products.forEach(crop => {
-                            const option = document.createElement('option');
-                            option.value = crop;
-                            option.textContent = crop;
-                            cropDropdown.appendChild(option);
-                        });
-                    });
-                }
-            });
-
-            fetch('/crops/show-crops')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Get the list elements for each category
-                    const vegetableList = document.getElementById('vegetable-crop-list');
-                    const fruitList = document.getElementById('fruits-crop-list');
-                    const commodityList = document.getElementById('commodity-crop-list');
-
-                    // Clear existing content
-                    vegetableList.innerHTML = '';
-                    fruitList.innerHTML = '';
-                    commodityList.innerHTML = '';
-
-                    // Track if any crops exist in each category
-                    let hasVegetables = false;
-                    let hasFruits = false;
-                    let hasCommodities = false;
-
-                    // Populate the lists
-                    data.crops.forEach(crop => {
-                        const listItem = document.createElement('li');
-                        listItem.innerHTML = `${crop.crop_name} 
-                            <i class="bi bi-x-lg ms-2" data-crop="${crop.crop_name}" data-category="${crop.category}" style="cursor: pointer; color: red;"></i>`;
-
-                        if (crop.category === "Vegetables") {
-                            vegetableList.appendChild(listItem);
-                            hasVegetables = true;
-                        } else if (crop.category === "Fruits") {
-                            fruitList.appendChild(listItem);
-                            hasFruits = true;
-                        } else if (crop.category === "Commodities") {
-                            commodityList.appendChild(listItem);
-                            hasCommodities = true;
-                        }
-                    });
-
-                    // Add placeholder message if a category is empty
-                    if (!hasVegetables) {
-                        const noVegetableMsg = document.createElement('li');
-                        noVegetableMsg.id = 'no-vegetables-msg';
-                        noVegetableMsg.innerText = 'No vegetables registered.';
-                        vegetableList.appendChild(noVegetableMsg);
-                    }
-                    if (!hasFruits) {
-                        const noFruitMsg = document.createElement('li');
-                        noFruitMsg.id = 'no-fruits-msg';
-                        noFruitMsg.innerText = 'No fruits registered.';
-                        fruitList.appendChild(noFruitMsg);
-                    }
-                    if (!hasCommodities) {
-                        const noCommodityMsg = document.createElement('li');
-                        noCommodityMsg.id = 'no-commodities-msg';
-                        noCommodityMsg.innerText = 'No commodities registered.';
-                        commodityList.appendChild(noCommodityMsg);
-                    }
-                }
-            })
-            .catch(error => console.error('Error fetching crops:', error));
-
-            // Add crop to registered crops
-            addCropBtn.addEventListener('click', function() {
-                const category = categoryDropdown.value;
-                const crop = cropDropdown.value;
-                
-                if (category && crop) {
-                    fetch('/crops/add-crop', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ category: category, crop_name: crop })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const listItem = document.createElement('li'); 
-                            listItem.innerHTML = `${crop} <i class="bi bi-x-lg ms-2" data-crop="${crop}" data-category="${category}" style="cursor: pointer; color: red;"></i>`;
-                            
-                            const vegetableList = document.getElementById('vegetable-crop-list');
-                            const fruitList = document.getElementById('fruits-crop-list');
-                            const commodityList = document.getElementById('commodity-crop-list');
-
-
-                            // Append to the correct category list
-                            if (category === "Vegetables") {
-                                document.getElementById('no-vegetables-msg')?.remove();
-                                vegetableList.appendChild(listItem);
-                            } else if (category === "Fruits") {
-                                document.getElementById('no-fruits-msg')?.remove();
-                                fruitList.appendChild(listItem);
-                            } else if (category === "Commodities") {
-                                document.getElementById('no-commodities-msg')?.remove();
-                                commodityList.appendChild(listItem);
-                            }
-                        } else {
-                            showAlert('warning', 'Crop already exist!')
-                        }
-                    })
-                    .catch(error => console.error('Crop already exist!', error));
-                }
-            });
-
-            // Remove crop from registered crops
-            document.addEventListener('click', function(event) {
-                if (event.target.classList.contains('bi-x-lg')) {
-                    const cropName = event.target.getAttribute('data-crop');
-                    const category = event.target.getAttribute('data-category');
-
-                    fetch('/crops/remove-crop', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ category: category, crop_name: cropName })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            event.target.parentElement.remove();
-                            const vegetableList = document.getElementById('vegetable-crop-list');
-                            const fruitList = document.getElementById('fruits-crop-list');
-                            const commodityList = document.getElementById('commodity-crop-list');
-
-                            if (commodityList.children.length === 0) {
-                                const noCommodityMsg = document.createElement('li');
-                                noCommodityMsg.id = 'no-commodities-msg';
-                                noCommodityMsg.innerText = 'No commodities registered.';
-                                commodityList.appendChild(noCommodityMsg);
-                            }
-                            if (fruitList.children.length === 0) {
-                                const noFruitMsg = document.createElement('li');
-                                noFruitMsg.id = 'no-fruits-msg';
-                                noFruitMsg.innerText = 'No fruits registered.';
-                                fruitList.appendChild(noFruitMsg);
-                            }
-                            if (vegetableList.children.length === 0) {
-                                const noVegetableMsg = document.createElement('li');
-                                noVegetableMsg.id = 'no-vegetables-msg';
-                                noVegetableMsg.innerText = 'No vegetables registered.';
-                                vegetableList.appendChild(noVegetableMsg);
-                            }
-                        }
-                    })
-                    .catch(error => console.error('Error removing crop:', error));
-                }
-            });
-        });
-
-        // alert messages
-        function showAlert(type, message) {
-            // Create a new alert element
-            const alert = document.createElement('div');
-            alert.classList.add('alert', `alert-${type}`, 'alert-dismissible', 'fade', 'show');
-            alert.setAttribute('role', 'alert');
-            alert.innerHTML = `${message}`;
-            
-            // Append the alert to the alert container
-            document.getElementById('alert-container').appendChild(alert);
-            
-            // Optionally, remove the alert after a certain time
-            setTimeout(() => {
-                alert.classList.remove('show');
-            }, 3000);
+    // updating user name    
+    document.getElementById("update-name-btn").addEventListener("click", function () {
+        const newName = document.getElementById("name").value.trim();
+        if (newName === "") {
+            showAlert('danger', 'Name cannot be empty!');
+            return;
         }
-    </script>
-</body>
-</html>
+    
+        fetch("/auth/update-name", {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name: newName })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                //document.getElementById("update-message").textContent = data.message;
+                showAlert('success', 'Name update successfully!')
+                document.getElementById('display-name').textContent = newName;
+                document.getElementById('display-name').style.display = 'inline-block';
+                document.getElementById('name').remove();
+                document.getElementById('update-name-btn').style.display = 'none';
+                document.getElementById('edit-name-btn').style.display = 'inline-block';
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+
+    // to get the updated list of products
+    document.addEventListener('DOMContentLoaded', function() {
+        const categoryDropdown = document.getElementById('category');
+        const cropDropdown = document.getElementById('crop');
+        const addCropBtn = document.getElementById('add-crop-btn');
+        const cropList = document.getElementById('crop-list');
+
+
+        // Fetch crops based on selected category
+        categoryDropdown.addEventListener('change', function() {
+            const selectedCategory = categoryDropdown.value;
+            cropDropdown.innerHTML = '<option value="">--Select Crop--</option>';
+            
+            if (selectedCategory) {
+                fetch('/get-products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ category: selectedCategory })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    data.products.forEach(crop => {
+                        const option = document.createElement('option');
+                        option.value = crop;
+                        option.textContent = crop;
+                        cropDropdown.appendChild(option);
+                    });
+                });
+            }
+        });
+
+        fetch('/crops/show-crops')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Get the list elements for each category
+                const vegetableList = document.getElementById('vegetable-crop-list');
+                const fruitList = document.getElementById('fruits-crop-list');
+                const commodityList = document.getElementById('commodity-crop-list');
+
+                // Clear existing content
+                vegetableList.innerHTML = '';
+                fruitList.innerHTML = '';
+                commodityList.innerHTML = '';
+
+                // Track if any crops exist in each category
+                let hasVegetables = false;
+                let hasFruits = false;
+                let hasCommodities = false;
+
+                // Populate the lists
+                data.crops.forEach(crop => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `${crop.crop_name} 
+                        <i class="bi bi-x-lg ms-2" data-crop="${crop.crop_name}" data-category="${crop.category}" style="cursor: pointer; color: red;"></i>`;
+
+                    if (crop.category === "Vegetables") {
+                        vegetableList.appendChild(listItem);
+                        hasVegetables = true;
+                    } else if (crop.category === "Fruits") {
+                        fruitList.appendChild(listItem);
+                        hasFruits = true;
+                    } else if (crop.category === "Commodities") {
+                        commodityList.appendChild(listItem);
+                        hasCommodities = true;
+                    }
+                });
+
+                // Add placeholder message if a category is empty
+                if (!hasVegetables) {
+                    const noVegetableMsg = document.createElement('li');
+                    noVegetableMsg.id = 'no-vegetables-msg';
+                    noVegetableMsg.innerText = 'No vegetables registered.';
+                    vegetableList.appendChild(noVegetableMsg);
+                }
+                if (!hasFruits) {
+                    const noFruitMsg = document.createElement('li');
+                    noFruitMsg.id = 'no-fruits-msg';
+                    noFruitMsg.innerText = 'No fruits registered.';
+                    fruitList.appendChild(noFruitMsg);
+                }
+                if (!hasCommodities) {
+                    const noCommodityMsg = document.createElement('li');
+                    noCommodityMsg.id = 'no-commodities-msg';
+                    noCommodityMsg.innerText = 'No commodities registered.';
+                    commodityList.appendChild(noCommodityMsg);
+                }
+            }
+        })
+        .catch(error => console.error('Error fetching crops:', error));
+
+        // Add crop to registered crops
+        addCropBtn.addEventListener('click', function() {
+            const category = categoryDropdown.value;
+            const crop = cropDropdown.value;
+            
+            if (category && crop) {
+                fetch('/crops/add-crop', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ category: category, crop_name: crop })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const listItem = document.createElement('li'); 
+                        listItem.innerHTML = `${crop} <i class="bi bi-x-lg ms-2" data-crop="${crop}" data-category="${category}" style="cursor: pointer; color: red;"></i>`;
+                        
+                        const vegetableList = document.getElementById('vegetable-crop-list');
+                        const fruitList = document.getElementById('fruits-crop-list');
+                        const commodityList = document.getElementById('commodity-crop-list');
+
+
+                        // Append to the correct category list
+                        if (category === "Vegetables") {
+                            document.getElementById('no-vegetables-msg')?.remove();
+                            vegetableList.appendChild(listItem);
+                        } else if (category === "Fruits") {
+                            document.getElementById('no-fruits-msg')?.remove();
+                            fruitList.appendChild(listItem);
+                        } else if (category === "Commodities") {
+                            document.getElementById('no-commodities-msg')?.remove();
+                            commodityList.appendChild(listItem);
+                        }
+                    } else {
+                        showAlert('warning', 'Crop already exist!')
+                    }
+                })
+                .catch(error => console.error('Crop already exist!', error));
+            }
+        });
+
+        // Remove crop from registered crops
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('bi-x-lg')) {
+                const cropName = event.target.getAttribute('data-crop');
+                const category = event.target.getAttribute('data-category');
+
+                fetch('/crops/remove-crop', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ category: category, crop_name: cropName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        event.target.parentElement.remove();
+                        const vegetableList = document.getElementById('vegetable-crop-list');
+                        const fruitList = document.getElementById('fruits-crop-list');
+                        const commodityList = document.getElementById('commodity-crop-list');
+
+                        if (commodityList.children.length === 0) {
+                            const noCommodityMsg = document.createElement('li');
+                            noCommodityMsg.id = 'no-commodities-msg';
+                            noCommodityMsg.innerText = 'No commodities registered.';
+                            commodityList.appendChild(noCommodityMsg);
+                        }
+                        if (fruitList.children.length === 0) {
+                            const noFruitMsg = document.createElement('li');
+                            noFruitMsg.id = 'no-fruits-msg';
+                            noFruitMsg.innerText = 'No fruits registered.';
+                            fruitList.appendChild(noFruitMsg);
+                        }
+                        if (vegetableList.children.length === 0) {
+                            const noVegetableMsg = document.createElement('li');
+                            noVegetableMsg.id = 'no-vegetables-msg';
+                            noVegetableMsg.innerText = 'No vegetables registered.';
+                            vegetableList.appendChild(noVegetableMsg);
+                        }
+                    }
+                })
+                .catch(error => console.error('Error removing crop:', error));
+            }
+        });
+    });
+</script>
+{% endblock %}

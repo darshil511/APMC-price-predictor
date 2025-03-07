@@ -3,6 +3,7 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;  
     background-size: cover;
+    padding-top: 60px;
     /* background-position: center; */
 }
 

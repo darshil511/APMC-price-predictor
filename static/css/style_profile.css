@@ -1,20 +1,9 @@
 /* General Page Styles */
 body {
-    font-family: 'Arial', sans-serif
+    font-family: 'Arial', sans-serif;
+    padding-top: 60px;
     /* display: flex;
     justify-content: center; */
-}
-
-.name-container {
-    /* position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: #f8f9fa;
-    padding: 10px;
-    border-bottom: 1px solid #ccc; */
-    /* background-color: #e9ecef; */
-    z-index: 1000; 
 }
 
 .crop-container {
