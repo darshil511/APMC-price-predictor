@@ -234,7 +234,7 @@ def predict():
         "forecast": [float(val) for val in forecast_mean.values],  # Convert to float
     }
     return render_template("result.html", response=response, product=product)
-    # return jsonify(response)
+    # return jsonify(response, product)
 
     # # Plot the results
     # fig, ax = plt.subplots(figsize=(10, 5))

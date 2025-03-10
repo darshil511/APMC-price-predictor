@@ -8,10 +8,15 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        password = request.form['password']
-        phone_number = request.form['phone_number']
+        data = request.get_json()
+        name = data.get('name')
+        email = data.get('email')
+        password = data.get('password')
+        phone_number = data.get('phone_number')
+        #name = request.form['name']
+        #email = request.form['email']
+        #password = request.form['password']
+        #phone_number = request.form['phone_number']
 
         # Check if user already exists
         existing_user = User.query.filter_by(email=email).first()
@@ -33,8 +38,11 @@ def register():
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        #email = request.form['email']
+        #password = request.form['password']
 
         user = User.query.filter_by(email=email).first()
         if not user:

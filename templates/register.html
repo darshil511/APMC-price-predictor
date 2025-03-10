@@ -47,14 +47,9 @@
 
         fetch('/auth/register', {
             method: 'POST',
-            body: new URLSearchParams({
-                name: name,
-                email: email,
-                phone_number: phone_number,
-                password: password
-            }),
+            body: JSON.stringify({ name, email, phone_number, password }),
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json'
             },
         })
         .then(response => response.json())  // Parse the JSON response

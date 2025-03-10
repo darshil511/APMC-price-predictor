@@ -228,19 +228,19 @@
 
                 // Add placeholder message if a category is empty
                 if (!hasVegetables) {
-                    const noVegetableMsg = document.createElement('li');
+                    const noVegetableMsg = document.createElement('span');
                     noVegetableMsg.id = 'no-vegetables-msg';
                     noVegetableMsg.innerText = 'No vegetables registered.';
                     vegetableList.appendChild(noVegetableMsg);
                 }
                 if (!hasFruits) {
-                    const noFruitMsg = document.createElement('li');
+                    const noFruitMsg = document.createElement('span');
                     noFruitMsg.id = 'no-fruits-msg';
                     noFruitMsg.innerText = 'No fruits registered.';
                     fruitList.appendChild(noFruitMsg);
                 }
                 if (!hasCommodities) {
-                    const noCommodityMsg = document.createElement('li');
+                    const noCommodityMsg = document.createElement('span');
                     noCommodityMsg.id = 'no-commodities-msg';
                     noCommodityMsg.innerText = 'No commodities registered.';
                     commodityList.appendChild(noCommodityMsg);
@@ -310,19 +310,19 @@
                         const commodityList = document.getElementById('commodity-crop-list');
 
                         if (commodityList.children.length === 0) {
-                            const noCommodityMsg = document.createElement('li');
+                            const noCommodityMsg = document.createElement('span');
                             noCommodityMsg.id = 'no-commodities-msg';
                             noCommodityMsg.innerText = 'No commodities registered.';
                             commodityList.appendChild(noCommodityMsg);
                         }
                         if (fruitList.children.length === 0) {
-                            const noFruitMsg = document.createElement('li');
+                            const noFruitMsg = document.createElement('span');
                             noFruitMsg.id = 'no-fruits-msg';
                             noFruitMsg.innerText = 'No fruits registered.';
                             fruitList.appendChild(noFruitMsg);
                         }
                         if (vegetableList.children.length === 0) {
-                            const noVegetableMsg = document.createElement('li');
+                            const noVegetableMsg = document.createElement('span');
                             noVegetableMsg.id = 'no-vegetables-msg';
                             noVegetableMsg.innerText = 'No vegetables registered.';
                             vegetableList.appendChild(noVegetableMsg);
