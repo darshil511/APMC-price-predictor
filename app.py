@@ -123,11 +123,11 @@ def predict():
     category = request.form.get("category")
     product = request.form.get("product")
     
-    # category = "Commodities"
-    # product = "જીરૂ"
+    file_path = base_dir / f"data/{category}/{category}_price_data.csv"
+    model_dir = base_dir / f"ml_models/{category}_saved_models"
 
     # Load data
-    data = pd.read_csv(global_file_path, parse_dates=["Date"], index_col="Date", dayfirst=True)
+    data = pd.read_csv(file_path, parse_dates=["Date"], index_col="Date", dayfirst=True)
     product_data = data[data["Item Name"] == product]
 
     if product_data.empty:
@@ -135,64 +135,64 @@ def predict():
         return render_template("error.html", message=error_message, page='home')
 
     # Prepare file paths
-    # hashed_name = safe_filename(product)
-    # model_path = os.path.join(global_model_dir, f"arima_model_{hashed_name}.pkl")
+    hashed_name = safe_filename(product)
+    model_path = os.path.join(model_dir, f"arima_model_{hashed_name}.pkl")
 
-    # # Check if the model exists
-    # if not os.path.exists(model_path):
-    #     error_message = "Model for the given product not found :(    Redirecting to homepage...."
+    # Check if the model exists
+    if not os.path.exists(model_path):
+        error_message = "Model for the given product not found :(    Redirecting to homepage...."
+        return render_template("error.html", message=error_message, page='home')
+
+    # Load the model
+    loaded_model = joblib.load(model_path)
+    
+    # price_data = product_data["Average Price"]
+    # product_parameters = get_product_parameters(global_filename, product)
+    # p, d, q = None, None, None
+    
+    # if not product_parameters:
+    #     error_message = "Product parameters are missing or empty. Redirecting to homepage..."
     #     return render_template("error.html", message=error_message, page='home')
-
-    # # Load the model
-    # loaded_model = joblib.load(model_path)
     
-    price_data = product_data["Average Price"]
-    product_parameters = get_product_parameters(global_filename, product)
-    p, d, q = None, None, None
-    
-    if not product_parameters:
-        error_message = "Product parameters are missing or empty. Redirecting to homepage..."
-        return render_template("error.html", message=error_message, page='home')
-    
-    for item in product_parameters:
-        try:
-            p = int(item['p'])  # Convert to int
-            d = int(item['d'])  # Convert to int
-            q = int(item['q'])  # Convert to int
-            if p is None or d is None or q is None:
-                raise ValueError("Missing one or more parameters ('p', 'd', 'q') in the product data.")
-            # Use the p, d, q values here
-        except KeyError as e:
-            print(f"Missing key in product data: {e}")
-            error_message = "Model for the given product not found :(    Redirecting to homepage...."
-            return render_template("error.html", message=error_message, page='home')
-        except ValueError as e:
-            print(f"Invalid value encountered: {e}")
-            error_message = "Model for the given product not found :(    Redirecting to homepage...."
-            return render_template("error.html", message=error_message, page='home')
+    # for item in product_parameters:
+    #     try:
+    #         p = int(item['p'])  # Convert to int
+    #         d = int(item['d'])  # Convert to int
+    #         q = int(item['q'])  # Convert to int
+    #         if p is None or d is None or q is None:
+    #             raise ValueError("Missing one or more parameters ('p', 'd', 'q') in the product data.")
+    #         # Use the p, d, q values here
+    #     except KeyError as e:
+    #         print(f"Missing key in product data: {e}")
+    #         error_message = "Model for the given product not found :(    Redirecting to homepage...."
+    #         return render_template("error.html", message=error_message, page='home')
+    #     except ValueError as e:
+    #         print(f"Invalid value encountered: {e}")
+    #         error_message = "Model for the given product not found :(    Redirecting to homepage...."
+    #         return render_template("error.html", message=error_message, page='home')
         
-    if p is None or d is None or q is None:
-        error_message = "Model parameters (p, d, q) not found for the product. Redirecting to homepage..."
-        return render_template("error.html", message=error_message, page='home')
+    # if p is None or d is None or q is None:
+    #     error_message = "Model parameters (p, d, q) not found for the product. Redirecting to homepage..."
+    #     return render_template("error.html", message=error_message, page='home')
         
-    fit_successful = False
+    # fit_successful = False
 
-    while not fit_successful and q >= 0:
-        try:
-            print(f"\nFitting ARIMA model with order ({p}, {d}, {q})...")
-            model = ARIMA(price_data, order=(p, d, q))
-            loaded_model = model.fit()
-            fit_successful = True  
-            print("ARIMA model fitted successfully!")
+    # while not fit_successful and q >= 0:
+    #     try:
+    #         print(f"\nFitting ARIMA model with order ({p}, {d}, {q})...")
+    #         model = ARIMA(price_data, order=(p, d, q))
+    #         loaded_model = model.fit()
+    #         fit_successful = True  
+    #         print("ARIMA model fitted successfully!")
                 
-        except np.linalg.LinAlgError as err:
-            print(f"Error encountered: {err}")
-            if q > 0: 
-                q -= 1
-                print(f"Reducing q to {q} and trying again...")
-            else:
-                error_message = "Unable to fit model after reducing q multiple times. Exiting loop."
-                return render_template("error.html", message=error_message, page='home')
+    #     except np.linalg.LinAlgError as err:
+    #         print(f"Error encountered: {err}")
+    #         if q > 0: 
+    #             q -= 1
+    #             print(f"Reducing q to {q} and trying again...")
+    #         else:
+    #             error_message = "Unable to fit model after reducing q multiple times. Exiting loop."
+    #             return render_template("error.html", message=error_message, page='home')
 
     # In-sample predictions
     price_data = product_data["Average Price"]
