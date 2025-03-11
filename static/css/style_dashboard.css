@@ -1,0 +1,12 @@
+body {
+    font-family: 'Arial', sans-serif;
+    padding-top: 60px;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 500px;  /* Ensures it doesn’t exceed a reasonable size */
+    height: 300px;  /* Fixed height to prevent infinite expansion */
+    margin: auto;
+}

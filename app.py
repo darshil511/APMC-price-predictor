@@ -12,10 +12,10 @@ from io import BytesIO
 from matplotlib import font_manager as fm
 from pathlib import Path
 from config import Config
-from models import db, User
+from models import db, User, UserCrops
 from auth import auth_bp
 from crops import crops_bp
-from flask_login import LoginManager, current_user
+from flask_login import LoginManager, current_user, login_required
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 load_dotenv()
@@ -259,6 +259,93 @@ def predict():
     # plot_url = base64.b64encode(img.getvalue()).decode("utf8")
 
     # return render_template("result.html", plot_url=plot_url, product=product)
+    
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    return render_template("dashboard.html")
+
+
+@app.route("/dashboard-data")
+@login_required
+def dashboard_data():
+    user_id = current_user.id
+
+    if not user_id:
+        return jsonify({"error": "User not authenticated"}), 401
+
+    # Fetch registered crops along with their categories
+    crops_data = UserCrops.query.filter_by(user_id=user_id).all()
+
+    if not crops_data:
+        return jsonify({"error": "No registered crops found!"}), 404
+
+    response_data = {}
+
+    for entry in crops_data:
+        category = entry.category
+        crop_name = entry.crop_name
+
+        file_path = base_dir / f"data/{category}/{category}_price_data.csv"
+        model_dir = base_dir / f"ml_models/{category}_saved_models"
+
+        # Load dataset
+        if not os.path.exists(file_path):
+            continue  # Skip if dataset file does not exist
+
+        data = pd.read_csv(file_path, parse_dates=["Date"], index_col="Date", dayfirst=True)
+
+        # Filter for the specific crop
+        product_data = data[data["Item Name"] == crop_name]
+
+        if product_data.empty:
+            continue  # Skip if no data for this crop
+
+        # Model path
+        hashed_name = safe_filename(crop_name)
+        model_path = os.path.join(model_dir, f"arima_model_{hashed_name}.pkl")
+
+        if not os.path.exists(model_path):
+            continue  # Skip if no trained model
+
+        # Load ARIMA model
+        loaded_model = joblib.load(model_path)
+
+        # Observed and Predicted Data
+        price_data = product_data["Average Price"]
+        pred = loaded_model.get_prediction(start=0, end=len(price_data) - 1)
+        pred_mean = pred.predicted_mean
+
+        # Forecast Future Prices
+        forecast_steps = 10
+        forecast = loaded_model.get_forecast(steps=forecast_steps)
+        forecast_mean = forecast.predicted_mean
+
+        # Exclude Sundays from forecast dates
+        last_date = pd.to_datetime(price_data.index[-1])
+        future_dates = []
+        current_date = last_date + pd.Timedelta(days=1)
+
+        while len(future_dates) < forecast_steps:
+            if current_date.weekday() != 6:  # Skip Sundays
+                future_dates.append(current_date)
+            current_date += pd.Timedelta(days=1)
+
+        # Store results in response data
+        if category not in response_data:
+            response_data[category] = {}
+
+        response_data[category][crop_name] = {
+            "dates": [date.strftime("%d-%m-%Y") for date in price_data.index],
+            "observed": [float(val) for val in price_data.values],
+            "predicted": [float(val) for val in pred_mean.values],
+            "forecast_dates": [date.strftime("%d-%m-%Y") for date in future_dates],
+            "forecast": [float(val) for val in forecast_mean.values],
+        }
+
+    return jsonify(response_data)
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=os.getenv("PORT"))

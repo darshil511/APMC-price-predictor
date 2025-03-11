@@ -7,9 +7,10 @@
 {% block content %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style_index.css') }}" />
   <h1 id="heading">Welcome to APMC Price Predictor!</h1>
+
   <form id="inputs" action="/predict" method="POST">
     <h2><label for="category">Category:</label></h2>
-    <select name="category" id="category">
+    <select class="form-control w-auto" name="category" id="category">
       <option value="" disabled selected>Select category</option>
       <option value="Commodities">જણસી</option>
       <option value="Fruits">ફળ</option>
@@ -17,12 +18,12 @@
     </select>
     <br />
     <h2><label for="product">Select a product:</label></h2>
-    <select id="product" name="product">
+    <select class="form-control  w-auto" id="product" name="product">
       <option value="" disabled selected>Choose a product</option>
     </select>
 
     <br />
-    <button type="submit">Predict</button>
+    <button class="btn btn-primary" type="submit">Predict</button>
   </form>
 
   <script>

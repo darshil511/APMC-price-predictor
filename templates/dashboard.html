@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | APMC Price Predictor{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_dashboard.css') }}">
+
+<div class="container-fluid">
+    <h2 class="text-center mb-4">Price Trend Dashboard</h2>
+    <div id="charts-container" class="row"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/dashboard-data')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error(data.error);
+                    return;
+                }
+
+                let chartsContainer = document.getElementById("charts-container");
+
+                Object.keys(data).forEach(category => {
+                    let categoryTitle = document.createElement("h3");
+                    categoryTitle.classList.add("col-12", "mt-4");
+                    categoryTitle.innerText = category.toUpperCase();
+                    chartsContainer.appendChild(categoryTitle);
+
+                    Object.keys(data[category]).forEach(crop => {
+                        let chartId = `chart-${category}-${crop.replace(/\s+/g, '-')}`;
+                        let colDiv = document.createElement("div");
+                        colDiv.classList.add("col-12", "col-md-6", "col-lg-6", "mb-4");
+
+                        colDiv.innerHTML = `
+                            <div class="card shadow p-3">
+                                <h5 class="text-center">${crop}</h5>
+                                <div class="chart-container">
+                                    <canvas id="${chartId}"></canvas>
+                                </div>
+                            </div>
+                        `;
+                        chartsContainer.appendChild(colDiv);
+
+                        createChart(chartId, data[category][crop]);
+                    });
+                });
+            })
+            .catch(error => console.error("Error fetching dashboard data:", error));
+
+        function createChart(canvasId, cropData) {
+            let ctx = document.getElementById(canvasId).getContext("2d");
+            let observedData = cropData.observed;
+            let predictedData = cropData.predicted;
+            let forecastData = cropData.forecast;
+            let dates = cropData.dates
+
+            let allPrices = [...observedData, ...predictedData, ...forecastData];
+
+            // Ensure forecast starts after last observed date
+            const alignedForecastData = new Array(dates.length).fill(null).concat(forecastData);
+            const totalDuration = 2000;
+            const delayBetweenPoints = totalDuration / observedData.length;
+            const previousY = (ctx) => ctx.index === 0 ? ctx.chart.scales.y.getPixelForValue(observedData[0]) : ctx.chart.getDatasetMeta(ctx.datasetIndex).data[ctx.index - 1].getProps(['y'], true).y;
+
+            new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: [...cropData.dates, ...cropData.forecast_dates],
+                    datasets: [
+                        {
+                            label: "Observed Prices",
+                            data: observedData,
+                            borderColor: "blue",
+                            backgroundColor: "rgba(0, 0, 255, 0.1)",
+                            tension: 0.3,
+                            pointRadius: 3,
+                            borderWidth: 2
+                        },
+                        {
+                            label: "Predicted Prices",
+                            data: predictedData,
+                            borderColor: "green",
+                            backgroundColor: "rgba(255, 165, 0, 0.1)",
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            pointRadius: 3,
+                            borderWidth: 2
+                        },
+                        {
+                            label: "Forecasted Prices",
+                            data: alignedForecastData,
+                            borderColor: "red",
+                            backgroundColor: "rgba(0, 255, 0, 0.1)",
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            pointRadius: 3,
+                            borderWidth: 2
+                        },
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        x: {
+                            type: 'number',
+                            easing: 'linear',
+                            duration: delayBetweenPoints,
+                            from: NaN, // the point is initially skipped
+                            delay(ctx) {
+                                if (ctx.type !== 'data' || ctx.xStarted) {
+                                    return 0;
+                                }
+                                ctx.xStarted = true;
+                                return ctx.index * delayBetweenPoints;
+                            }
+                        },
+                        y: {
+                            type: 'number',
+                            easing: 'linear',
+                            duration: delayBetweenPoints,
+                            from: previousY,
+                            delay(ctx) {
+                                if (ctx.type !== 'data' || ctx.yStarted) {
+                                    return 0;
+                                }
+                                ctx.yStarted = true;
+                                return ctx.index * delayBetweenPoints;
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: true
+                    },        
+                    scales: {
+                        y: {
+                            title: { display: true, text: "Price (₹)" }
+                        },
+                        x: {
+                            title: { display: true, text: "Date" }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
