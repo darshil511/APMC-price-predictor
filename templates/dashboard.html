@@ -31,12 +31,19 @@
 
                     Object.keys(data[category]).forEach(crop => {
                         let chartId = `chart-${category}-${crop.replace(/\s+/g, '-')}`;
+                        //let colId = `col-${category}-${crop.replace(/\s+/g, '-')}`; // Unique ID for column
                         let colDiv = document.createElement("div");
                         colDiv.classList.add("col-12", "col-md-6", "col-lg-6", "mb-4");
+                        //colDiv.id = colId; // Assign unique ID to column container
 
                         colDiv.innerHTML = `
                             <div class="card shadow p-3">
-                                <h5 class="text-center">${crop}</h5>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="text-center flex-grow-1">${crop}</h5>
+                                    <button class="toggle-size btn btn-sm" data-chart="${chartId}">
+                                        <i class="bi bi-fullscreen"></i>
+                                    </button>
+                                </div>
                                 <div class="chart-container">
                                     <canvas id="${chartId}"></canvas>
                                 </div>
@@ -149,6 +156,25 @@
                 }
             });
         }
+
+        // document.getElementById("charts-container").addEventListener("click", function (event) {
+        //     if (event.target.closest(".toggle-size")) {
+        //         let button = event.target.closest(".toggle-size");
+        //         let colId = button.getAttribute("data-chart"); // Get parent container's ID
+        //         let chartCard = document.getElementById(colId); // Get the correct chart container
+        //         console.log(chartCard);
+
+        //         if (chartCard.classList.contains("col-md-6")) {
+        //             chartCard.classList.remove("col-md-6");
+        //             chartCard.classList.add("col-md-12");
+        //             button.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
+        //         } else {
+        //             chartCard.classList.remove("col-md-12");
+        //             chartCard.classList.add("col-md-6");
+        //             button.innerHTML = '<i class="bi bi-fullscreen"></i>';
+        //         }
+        //     }
+        // });
     });
 </script>
 {% endblock %}
