@@ -50,7 +50,7 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
 base_dir = Path(os.getenv("BASE_DIRECTORY"))
 font_path = base_dir / "NotoSerifGujarati-Black.ttf"
 guj_fonts = fm.FontProperties(fname=font_path)
-global_file_path = base_dir / "data/commodities/commodities_price_data.csv"
+global_file_path = base_dir / "data/commodities/commodities_price_data-all_years.csv"
 global_model_dir = base_dir / "ml_models/commodities_saved_models"
 global_filename = base_dir / "ml_models/commodities_saved_models/commodities_parameters.csv"
 

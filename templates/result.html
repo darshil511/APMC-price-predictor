@@ -1,21 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Price Prediction Result</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_result.css') }}" />
-  </head>
-  <body>
-    <h1>Price Prediction Result for {{ product }}</h1>
+{% extends 'base.html' %}
+
+{% block title %}Result | APMC Price Predictor{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_result.css') }}" />
+
+<h1>Price Prediction Result for {{ product }}</h1>
 
     <div class="chart-container" id="chartContainer">
+      <button class="btn btn-primary" onclick="updateChart(7)">Past 7 Days</button>
+      <button class="btn btn-primary" onclick="updateChart(15)">Past 15 Days</button>
+      <button class="btn btn-primary" onclick="updateChart(30)">Past 30 Days</button>
+      <button class="btn btn-primary" onclick="updateChart(180)">Past 6 Months</button>
       <canvas id="priceChart"></canvas>
       <div class="toggle-btn" id="toggleButton">⛶</div>
     </div>
-
-    <a class="back-button" href="/">Go Back</a>
 
     <script>
         const ctx = document.getElementById('priceChart').getContext('2d');
@@ -33,26 +33,45 @@
 
 
         // Ensure forecast starts after last observed date
+        const fullLabels = dates.concat(forecastDates);
         const alignedForecastData = new Array(dates.length).fill(null).concat(forecastData);
+
+        // Function to Get Last 'N' Data Points
+        function getLastNDataPoints(n) {
+            const totalPoints = dates.length;  // Only observed & predicted part
+
+            // Ensure at least the available data is shown
+            const sliceIndex = Math.max(totalPoints - n, 0);
+
+            return {
+                labels: fullLabels.slice(sliceIndex),  // Include forecast dates
+                observed: observedData.slice(sliceIndex),
+                predicted: predictedData.slice(sliceIndex),
+                forecast: alignedForecastData.slice(sliceIndex)
+            };
+        }
+
+        // Initial Data (Default: 15 Days)
+        let initialData = getLastNDataPoints(15);
         
         const chartData = {
-            labels: dates.concat(forecastDates),
+            labels: initialData.labels,
             datasets: [
                 {
                     label: 'Observed Prices',
-                    data: observedData,
+                    data: initialData.observed,
                     borderColor: 'blue',
                     fill: false,
                 },
                 {
                     label: 'Predicted Prices',
-                    data: predictedData,
+                    data: initialData.predicted,
                     borderColor: 'green',
                     fill: false,
                 },
                 {
                     label: 'Forecast Prices',
-                    data: alignedForecastData,
+                    data: initialData.forecast,
                     borderColor: 'red',
                     fill: false,
                 }
@@ -112,11 +131,30 @@
             }
         };
         
-        new Chart(ctx, {
+        let priceChart = new Chart(ctx, {
             type: 'line',
             data: chartData,
             options: chartOptions
         });
+
+        // Function to Update Chart
+        function updateChart(days) {
+            let newData = getLastNDataPoints(days);
+            // Destroy the existing chart instance if it exists
+            if (priceChart !== null) {
+                priceChart.destroy();
+            }
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: chartOptions
+            });
+            priceChart.data.labels = newData.labels;
+            priceChart.data.datasets[0].data = newData.observed;
+            priceChart.data.datasets[1].data = newData.predicted;
+            priceChart.data.datasets[2].data = newData.forecast;
+            priceChart.update();
+        }
 
         // Toggle Fullscreen Functionality
         const chartContainer = document.getElementById("chartContainer");
@@ -133,5 +171,4 @@
         });
 
     </script>
-  </body>
-</html>
+{% endblock %}
