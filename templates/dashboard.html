@@ -10,6 +10,23 @@
     <div id="charts-container" class="row"></div>
 </div>
 
+
+<!-- Fullscreen Chart Modal -->
+<div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-center flex-grow-1" id="chartModalLabel">Expanded Chart View</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <canvas id="fullscreenChart" style="width: 100%; height: 500px;"></canvas>
+        </div>
+      </div>
+    </div>
+</div>
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -40,15 +57,11 @@
                             <div class="card shadow p-3">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h5 class="text-center flex-grow-1">${crop}</h5>
-                                    <button class="toggle-size btn btn-sm" data-chart="${chartId}">
+                                    <button class="toggle-size btn btn-sm" data-chart="${chartId}" data-bs-toggle="modal" data-bs-target="#chartModal">
                                         <i class="bi bi-fullscreen"></i>
                                     </button>
                                 </div>
                                 <div class="chart-container">
-                                    <button class="btn btn-primary btn-sm" onclick="updateChart(7)">Past 7 Days</button>
-                                    <button class="btn btn-primary btn-sm" onclick="updateChart(15)">Past 15 Days</button>
-                                    <button class="btn btn-primary btn-sm" onclick="updateChart(30)">Past 30 Days</button>
-                                    <button class="btn btn-primary btn-sm" onclick="updateChart(180)">Past 6 Months</button>
                                     <canvas id="${chartId}"></canvas>
                                 </div>
                             </div>
@@ -57,6 +70,14 @@
 
                         createChart(chartId, data[category][crop]);
                     });
+                });
+
+                // Attach event listener for fullscreen buttons
+                document.querySelectorAll(".toggle-size").forEach(button => {
+                    button.addEventListener("click", function () {
+                        const chartId = this.getAttribute("data-chart");
+                        openFullscreenChart(chartId);
+                    })
                 });
             })
             .catch(error => console.error("Error fetching dashboard data:", error));
@@ -76,7 +97,7 @@
             const delayBetweenPoints = totalDuration / observedData.length;
             const previousY = (ctx) => ctx.index === 0 ? ctx.chart.scales.y.getPixelForValue(observedData[0]) : ctx.chart.getDatasetMeta(ctx.datasetIndex).data[ctx.index - 1].getProps(['y'], true).y;
 
-            new Chart(ctx, {
+            const chart = new Chart(ctx, {
                 type: "line",
                 data: {
                     labels: [...cropData.dates, ...cropData.forecast_dates],
@@ -159,26 +180,46 @@
                     }
                 }
             });
+
+            return chart;
         }
 
-        // document.getElementById("charts-container").addEventListener("click", function (event) {
-        //     if (event.target.closest(".toggle-size")) {
-        //         let button = event.target.closest(".toggle-size");
-        //         let colId = button.getAttribute("data-chart"); // Get parent container's ID
-        //         let chartCard = document.getElementById(colId); // Get the correct chart container
-        //         console.log(chartCard);
+        let chartInstance = null;
 
-        //         if (chartCard.classList.contains("col-md-6")) {
-        //             chartCard.classList.remove("col-md-6");
-        //             chartCard.classList.add("col-md-12");
-        //             button.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
-        //         } else {
-        //             chartCard.classList.remove("col-md-12");
-        //             chartCard.classList.add("col-md-6");
-        //             button.innerHTML = '<i class="bi bi-fullscreen"></i>';
-        //         }
-        //     }
-        // });
+        function openFullscreenChart(chartId) {
+            const originalChart = Chart.getChart(chartId);
+            if (!originalChart) return;
+
+            //const chartModal = new bootstrap.Modal(document.getElementById("chartModal"));
+            //chartModal.show();
+
+            setTimeout(() => {
+                if (chartInstance) {
+                    chartInstance.destroy();
+                }
+                const ctx = document.getElementById("fullscreenChart").getContext("2d");
+                chartInstance = new Chart(ctx, {
+                    type: originalChart.config.type,
+                    data: originalChart.config.data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true } },
+                        scales: {
+                            x: { title: { display: true, text: "Dates" } },
+                            y: { title: { display: true, text: "Price" } }
+                        }
+                    }
+                });
+            }, 200);
+        }
+
+        document.getElementById("chartModal").addEventListener("hidden.bs.modal", function () {
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+        });
     });
 </script>
 {% endblock %}
