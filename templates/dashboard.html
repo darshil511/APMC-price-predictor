@@ -80,7 +80,7 @@
                 document.querySelectorAll(".toggle-size").forEach(button => {
                     button.addEventListener("click", function () {
                         const chartId = this.getAttribute("data-chart");
-                        openFullscreenChart(chartId, data, 25);
+                        openFullscreenChart(chartId, data, 30);
                     })
                 });
             })
@@ -211,6 +211,9 @@
                     chartInstance.destroy();
                 }
                 chartInstance = createChart("fullscreenChart", cropData, days)
+                window.updateChart = function (days){
+                    openFullscreenChart(chartId, data, days);
+                }
             }, 200);
         }
 
