@@ -16,7 +16,11 @@
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title text-center flex-grow-1" id="chartModalLabel">Expanded Chart View</h5>
+            <button class="btn btn-primary btn-sm me-2" onclick="updateChart(7)">Past 7 Days</button>
+            <button class="btn btn-primary btn-sm me-2" onclick="updateChart(15)">Past 15 Days</button>
+            <button class="btn btn-primary btn-sm me-2" onclick="updateChart(30)">Past 30 Days</button>
+            <button class="btn btn-primary btn-sm me-2" onclick="updateChart(180)">Past 6 Months</button>
+          <h5 class="modal-title text-center flex-grow-1" id="chartModalLabel"></h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -68,7 +72,7 @@
                         `;
                         chartsContainer.appendChild(colDiv);
 
-                        createChart(chartId, data[category][crop]);
+                        createChart(chartId, data[category][crop], 15);
                     });
                 });
 
@@ -76,20 +80,23 @@
                 document.querySelectorAll(".toggle-size").forEach(button => {
                     button.addEventListener("click", function () {
                         const chartId = this.getAttribute("data-chart");
-                        openFullscreenChart(chartId);
+                        openFullscreenChart(chartId, data, 25);
                     })
                 });
             })
             .catch(error => console.error("Error fetching dashboard data:", error));
 
-        function createChart(canvasId, cropData) {
-            let ctx = document.getElementById(canvasId).getContext("2d");
-            let observedData = cropData.observed;
-            let predictedData = cropData.predicted;
-            let forecastData = cropData.forecast;
-            let dates = cropData.dates
+        function createChart(canvasId, cropData, days) {
+            // Calculate the starting index for past 'days' data
+            let startIndex = Math.max(0, cropData.dates.length - days);
 
-            let allPrices = [...observedData, ...predictedData, ...forecastData];
+            let ctx = document.getElementById(canvasId).getContext("2d");
+            let observedData = cropData.observed.slice(startIndex);
+            let predictedData = cropData.predicted.slice(startIndex);
+            let forecastData = cropData.forecast;
+            let dates = cropData.dates.slice(startIndex);
+
+            //let allPrices = [...observedData, ...predictedData, ...forecastData];
 
             // Ensure forecast starts after last observed date
             const alignedForecastData = new Array(dates.length).fill(null).concat(forecastData);
@@ -100,7 +107,7 @@
             const chart = new Chart(ctx, {
                 type: "line",
                 data: {
-                    labels: [...cropData.dates, ...cropData.forecast_dates],
+                    labels: [...cropData.dates, ...cropData.forecast_dates].slice(startIndex),
                     datasets: [
                         {
                             label: "Observed Prices",
@@ -186,31 +193,24 @@
 
         let chartInstance = null;
 
-        function openFullscreenChart(chartId) {
+        function openFullscreenChart(chartId, data, days) {
             const originalChart = Chart.getChart(chartId);
             if (!originalChart) return;
 
-            //const chartModal = new bootstrap.Modal(document.getElementById("chartModal"));
-            //chartModal.show();
+            const canvasId = originalChart.canvas.id;
+            const parts = canvasId.split('-');
+            const category = parts[1];
+            const crop = parts.slice(2).join(' ');
+            const cropData = data[category] && data[category][crop];
+
+            const labelId = document.getElementById("chartModalLabel");
+            labelId.innerHTML = `${crop}`;
 
             setTimeout(() => {
                 if (chartInstance) {
                     chartInstance.destroy();
                 }
-                const ctx = document.getElementById("fullscreenChart").getContext("2d");
-                chartInstance = new Chart(ctx, {
-                    type: originalChart.config.type,
-                    data: originalChart.config.data,
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: true } },
-                        scales: {
-                            x: { title: { display: true, text: "Dates" } },
-                            y: { title: { display: true, text: "Price" } }
-                        }
-                    }
-                });
+                chartInstance = createChart("fullscreenChart", cropData, days)
             }, 200);
         }
 
