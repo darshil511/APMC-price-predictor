@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}About | APMC Price Predictor{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        padding-top: 60px;
+    }
+</style>
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">About APMC Price Predictor</h2>
+
+    <div class="card shadow p-4">
+        <p>
+            The APMC Price Predictor is designed to help farmers and traders predict the future prices of agricultural commodities. 
+            Using Machine Learning models like ARIMA, the platform provides accurate price trends based on historical data.
+        </p>
+
+        <h4 class="mt-4">✨ Key Features:</h4>
+        <ul>
+            <li>📊 Real-time price trend analysis for crops.</li>
+            <li>🔔 Notifications for registered crops via SMS/WhatsApp.</li>
+            <li>📈 Interactive dashboard with dynamic chart filtering.</li>
+            <li>🔍 Predictive analytics using uni-variate ML models.</li>
+            <li>📌 User-friendly interface with mobile responsiveness.</li>
+        </ul>
+
+        <h4 class="mt-4">🚀 Our Mission:</h4>
+        <p>
+            To empower farmers and traders with data-driven insights, ensuring better decision-making and optimized profits in the agricultural sector.
+        </p>
+    </div>
+
+    
+    <div class="card shadow p-4 mt-4">
+        <h2 class="text-center mb-4">📖 User Guide</h2>
+
+        <h4>Step 1: Register & Login</h4>
+        <p>New users must first sign up by providing their name, email, and phone number. If you already have an account, log in using your credentials.</p>
+
+        <h4>Step 2: Register Crops for Price Tracking</h4>
+        <p>
+            Once logged in, navigate to the Profile Page and select your crops from the available categories (Vegetables, Fruits, Commodities).  
+            These registered crops will be used for price tracking and notifications.
+        </p>
+
+        <h4>Step 3: View Dashboard & Analyze Price Trends</h4>
+        <p>
+            Navigate to the Dashboard to view interactive charts for all your registered crops.  
+            <strong>Features of the Dashboard:</strong>
+        </p>
+        <ul>
+            <li>📅 View past 7, 15, 30 days, or 6 months of price data.</li>
+            <li>📈 Full-screen charts for better visualization.</li>
+            <li>💡 Real-time updates on price fluctuations.</li>
+        </ul>
+
+        <h4>Step 4: Receive Notifications</h4>
+        <p>
+            If there are significant price changes, you will receive notifications via SMS/WhatsApp for your registered crops.  
+            This helps you make informed decisions on selling or storing your crops.
+        </p>
+
+        <h4>Step 5: Predict Future Prices</h4>
+        <p>
+            Using the <a href="{{ url_for('home') }}">Predictor Tool</a>, enter your desired crop and see the forecasted prices for the next few days.  
+            This enables better planning and financial security.
+        </p>
+
+        <h4>Step 6: Contact Us for Queries</h4>
+        <p>
+            If you have any questions or feedback, visit the <a href="{{ url_for('contact') }}">Contact Page</a> and send us a message.
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -116,6 +116,24 @@ def base():
 def home():
     return render_template("index.html")
 
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        data = request.get_json()
+        name = data.get('name')
+        email = data.get('email')
+        message = data.get('message')
+        
+        if not (name and email and message):
+            return jsonify({"success": False, "message": "Please enter the required fields"}), 400
+        
+        return jsonify({"success": True, "message": f"Thank you {name} for contacting us 😇"})
+
+    return render_template('contact.html')
 
 @app.route("/predict", methods=["POST"])
 def predict():
