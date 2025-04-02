@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, make_response, send_from_directory
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,6 +15,7 @@ from config import Config
 from models import db, User, UserCrops
 from auth import auth_bp
 from crops import crops_bp
+from notifications import notifications_bp
 from flask_login import LoginManager, current_user, login_required
 from flask_migrate import Migrate
 from dotenv import load_dotenv
@@ -44,6 +45,8 @@ def inject_user():
 # Register Blueprint
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(crops_bp, url_prefix='/crops')
+app.register_blueprint(notifications_bp, url_prefix='/notifications')
+# print(app.url_map)
 
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', os.urandom(24))
 
@@ -282,7 +285,20 @@ def predict():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template("dashboard.html")
+    return render_template('dashboard.html', 
+        FIREBASE_CONFIG_apiKey=os.getenv("FIREBASE_CONFIG_apiKey"),
+        FIREBASE_CONFIG_authDomain=os.getenv("FIREBASE_CONFIG_authDomain"),
+        FIREBASE_CONFIG_projectId=os.getenv("FIREBASE_CONFIG_projectId"),
+        FIREBASE_CONFIG_storageBucket=os.getenv("FIREBASE_CONFIG_storageBucket"),
+        FIREBASE_CONFIG_messagingSenderId=os.getenv("FIREBASE_CONFIG_messagingSenderId"),
+        FIREBASE_CONFIG_appId=os.getenv("FIREBASE_CONFIG_appId"),
+        FIREBASE_CONFIG_measurementId=os.getenv("FIREBASE_CONFIG_measurementId"),
+        FIREBASE_PUBLIC_KEY=os.getenv("FIREBASE_PUBLIC_KEY")
+    )
+
+@app.route('/firebase-messaging-sw.js')
+def service_worker():
+    return send_from_directory('static/js', 'firebase-messaging-sw.js', mimetype='application/javascript')
 
 
 @app.route("/dashboard-data")
@@ -366,4 +382,4 @@ def dashboard_data():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=os.getenv("PORT"))
+    app.run(debug=True, port=os.getenv("PORT"), host=os.getenv("HOST"))

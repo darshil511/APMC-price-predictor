@@ -13,10 +13,6 @@ def register():
         email = data.get('email')
         password = data.get('password')
         phone_number = data.get('phone_number')
-        #name = request.form['name']
-        #email = request.form['email']
-        #password = request.form['password']
-        #phone_number = request.form['phone_number']
 
         # Check if user already exists
         existing_user = User.query.filter_by(email=email).first()

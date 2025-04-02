@@ -12,6 +12,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     phone_number = db.Column(db.String(10), unique=True, nullable=False)
+    fcm_token = db.Column(db.String(255), nullable=True)
     crops = db.relationship('UserCrops', backref='user', lazy=True, cascade="all, delete-orphan")
 
 
