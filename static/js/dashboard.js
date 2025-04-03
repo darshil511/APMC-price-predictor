@@ -31,7 +31,6 @@ async function getFCMToken() {
         });
 
         if (token) {
-            console.log("✅ FCM Token:", token);
             saveTokenToDatabase(token);
         } else {
             console.log("❌ No FCM token received.");

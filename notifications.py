@@ -10,7 +10,6 @@ notifications_bp = Blueprint('notifications', __name__)
 base_dir = Path(os.getenv("BASE_DIRECTORY"))
 
 firebase_key_path = base_dir / os.getenv("FCM_PRIVATE_KEY_PATH")
-print(firebase_key_path)
 
 # Initialize Firebase Admin SDK
 if not firebase_admin._apps:
@@ -55,24 +54,6 @@ def store_fcm_token():
         user.fcm_token = fcm_token
         db.session.commit()
         return jsonify({"message": "FCM token stored successfully!"}), 200
-    else:
-        return jsonify({"error": "User not found"}), 404
-    
-    
-@login_required
-def save_fcm_token():
-    data = request.json
-    token = data.get("token")
-
-    if not token:
-        return jsonify({"error": "No token provided"}), 400
-
-    # Update user's FCM token in the database
-    user = User.query.get(current_user.id)
-    if user:
-        user.fcm_token = token
-        db.session.commit()
-        return jsonify({"message": "FCM token saved successfully!"}), 200
     else:
         return jsonify({"error": "User not found"}), 404
 
