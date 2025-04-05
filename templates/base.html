@@ -122,7 +122,23 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
+        window.FIREBASE_CONFIG = {{ FIREBASE_CONFIG | tojson | safe }};
+        window.FIREBASE_PUBLIC_KEY = "{{ FIREBASE_PUBLIC_KEY }}";
+        window.IS_LOGGED_IN = {{ is_logged_in | tojson }};
+    </script>
+    <script>
+      // ✅ Register the Service Worker
+      navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      .then((registration) => {
+          console.log("✅ Service Worker registered successfully:");
+      })
+      .catch((err) => console.error("❌ Service Worker registration failed:", err));
+    </script>
+    <script type="module" src="{{ url_for('static', filename='js/firebase-init.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script type="module">
       // alert messages
       function showAlert(type, message) {
         // Create a new alert element
@@ -156,8 +172,42 @@
       function handleLogin() {
         window.location.href = "{{ url_for('auth.login') }}"
       }
+      import { messaging, getToken, deleteToken} from '/static/js/firebase-init.js';
+      const vapidKey = window.FIREBASE_PUBLIC_KEY;
       
-      function handleLogout() {
+      async function handleLogout() {
+        try {
+            //const token = await getToken(messaging, { vapidKey: vapidKey });
+            const response = await fetch('/notifications/check_fcm_token', {
+                method: 'GET',
+                credentials: 'include' // Important if you’re using session-based authentication
+            });
+            if (!response.ok) {
+                throw new Error(`Error fetching token: ${response.status}`);
+            }
+            const data = await response.json();
+            const token = data.token;
+            if (token) {
+                // Optionally delete from client too
+                await deleteToken(messaging);
+    
+                // Notify the backend to delete it from the database
+                await fetch('/notifications/remove_fcm_token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Token removal response:", data.message);
+                })
+                .catch(err => {
+                    console.error("Error while removing token:", err);
+                });
+            }
+        } catch (err) {
+            console.error("Token removal failed", err);
+        }
         fetch("{{ url_for('auth.logout') }}", { method: 'POST' }) // Backend logout call
           .then((response) => {
             if (response.ok) {
@@ -166,6 +216,7 @@
             }
           })
       }
+      window.handleLogout = handleLogout;
     </script>
   </body>
 </html>

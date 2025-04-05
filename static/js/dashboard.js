@@ -1,13 +1,5 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
-import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-messaging.js';
-
-// ✅ Load Firebase config from `window` (set in `dashboard.html`)
-const firebaseConfig = window.FIREBASE_CONFIG;
+import { messaging, onMessage, getToken } from './firebase-init.js';
 const vapidKey = window.FIREBASE_PUBLIC_KEY;
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
 
 // ✅ Request Notification Permission
 async function requestNotificationPermission() {
@@ -16,7 +8,22 @@ async function requestNotificationPermission() {
     
     if (permission === "granted") {
         console.log("✅ Notification permission granted.");
-        getFCMToken(); // Get FCM Token
+        // Fetch stored token from backend (or pass it via template context)
+        fetch('/notifications/check_fcm_token')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.token) {
+                console.log("No token found in DB. Fetching new FCM token...");
+                getFCMToken(); // Call only if token doesn't exist
+            } else {
+                console.log("✅ FCM token already exists in DB. Skipping fetch.");
+            }
+        })
+        .catch(err => {
+            console.error("⚠️ Error checking token in DB:", err);
+            // Fallback: try to get the token
+            getFCMToken();
+        });
     } else {
         console.log("❌ Notification permission denied.");
     }
@@ -65,5 +72,10 @@ onMessage(messaging, (payload) => {
     alert(`📩 ${payload.notification.title}: ${payload.notification.body}`);
 });
 
-// Call permission request on page load
-requestNotificationPermission();
+if (window.IS_LOGGED_IN) {
+    // Call permission request on page load
+    requestNotificationPermission();
+} else {
+    console.log("🔒 User not logged in. Skipping notification permission.");
+}
+

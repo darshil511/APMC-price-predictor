@@ -21,8 +21,33 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
     console.log("📩 Received background message: ", payload);
 
-    self.registration.showNotification(payload.notification.title, {
-        body: payload.notification.body,
-        icon: "/static/icons/notification-icon.png"
+    const { title, body, url } = payload.data;
+
+    self.registration.showNotification(title, {
+        body: body,
+        icon: "/static/icons/notification-icon.png",
+        data: { url }
     });
+});
+
+self.addEventListener('notificationclick', function(event) {
+    event.notification.close();
+
+    const urlToOpen = event.notification.data.url;
+
+    const clickResponsePromise = clients.matchAll({
+        type: "window",
+        includeUncontrolled: true
+    }).then(windowClients => {
+        for (let client of windowClients) {
+            if (client.url === urlToOpen && 'focus' in client) {
+                return client.focus();
+            }
+        }
+        if (clients.openWindow) {
+            return clients.openWindow(urlToOpen);
+        }
+    });
+
+    event.waitUntil(clickResponsePromise);
 });

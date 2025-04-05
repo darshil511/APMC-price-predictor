@@ -1,8 +1,5 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-from models import db, bcrypt, User, UserCrops
 from app import app
+from models import User
 import firebase_admin
 from firebase_admin import credentials, messaging
 import os, pandas as pd
@@ -71,10 +68,11 @@ def detect_price_changes():
 def send_notification(user, crop_name, previous_price, latest_price, price_change_percent):
     if user.fcm_token:
         message = messaging.Message(
-            notification=messaging.Notification(
-                title=f"Price Alert: {crop_name}",
-                body=f"{crop_name} price changed by {price_change_percent:.2f}%. New price: {latest_price}. Old price: {previous_price}"
-            ),
+            data={
+                'title': f"Price Alert: {crop_name}",
+                'body': f"{crop_name} price changed by {price_change_percent:.2f}%. New price: {latest_price}. Old price: {previous_price}",
+                'url': f"{os.getenv('PROTOCOL')}://{os.getenv('HOST')}:{os.getenv('PORT')}/dashboard"
+            },
             token=user.fcm_token
         )
         response = messaging.send(message)

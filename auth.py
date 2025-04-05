@@ -37,8 +37,6 @@ def login():
         data = request.get_json()
         email = data.get('email')
         password = data.get('password')
-        #email = request.form['email']
-        #password = request.form['password']
 
         user = User.query.filter_by(email=email).first()
         if not user:

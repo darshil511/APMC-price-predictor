@@ -111,9 +111,25 @@ def get_products():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.context_processor
+def inject_firebase_config():
+    return {
+        'FIREBASE_CONFIG': {
+            'apiKey': os.getenv("FIREBASE_CONFIG_apiKey"),
+            'authDomain': os.getenv("FIREBASE_CONFIG_authDomain"),
+            'projectId': os.getenv("FIREBASE_CONFIG_projectId"),
+            'storageBucket': os.getenv("FIREBASE_CONFIG_storageBucket"),
+            'messagingSenderId': os.getenv("FIREBASE_CONFIG_messagingSenderId"),
+            'appId': os.getenv("FIREBASE_CONFIG_appId"),
+            'measurementId': os.getenv("FIREBASE_CONFIG_measurementId")
+        },
+        'FIREBASE_PUBLIC_KEY': os.getenv("FIREBASE_PUBLIC_KEY"),
+        'is_logged_in': current_user.is_authenticated
+    }
+
 @app.route("/base")
 def base():
-    return render_template("base.html")
+    return render_template('base.html')
 
 @app.route("/")
 def home():
@@ -285,16 +301,7 @@ def predict():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template('dashboard.html', 
-        FIREBASE_CONFIG_apiKey=os.getenv("FIREBASE_CONFIG_apiKey"),
-        FIREBASE_CONFIG_authDomain=os.getenv("FIREBASE_CONFIG_authDomain"),
-        FIREBASE_CONFIG_projectId=os.getenv("FIREBASE_CONFIG_projectId"),
-        FIREBASE_CONFIG_storageBucket=os.getenv("FIREBASE_CONFIG_storageBucket"),
-        FIREBASE_CONFIG_messagingSenderId=os.getenv("FIREBASE_CONFIG_messagingSenderId"),
-        FIREBASE_CONFIG_appId=os.getenv("FIREBASE_CONFIG_appId"),
-        FIREBASE_CONFIG_measurementId=os.getenv("FIREBASE_CONFIG_measurementId"),
-        FIREBASE_PUBLIC_KEY=os.getenv("FIREBASE_PUBLIC_KEY")
-    )
+    return render_template('dashboard.html')
 
 @app.route('/firebase-messaging-sw.js')
 def service_worker():
@@ -382,4 +389,4 @@ def dashboard_data():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=os.getenv("PORT"), host=os.getenv("HOST"))
+    app.run(debug=True, port=os.getenv("PORT"), host=os.getenv("ALLHOST"))

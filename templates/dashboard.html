@@ -18,14 +18,14 @@
     window.FIREBASE_PUBLIC_KEY = "{{ FIREBASE_PUBLIC_KEY }}";
 </script>
 <script>
-    // ✅ Register the Service Worker
-    navigator.serviceWorker.register('/firebase-messaging-sw.js')
-    .then((registration) => {
-        console.log("✅ Service Worker registered successfully:");
-    })
-    .catch((err) => console.error("❌ Service Worker registration failed:", err));
+  // ✅ Register the Service Worker
+  navigator.serviceWorker.register('/firebase-messaging-sw.js')
+  .then((registration) => {
+      console.log("✅ Service Worker registered successfully:");
+  })
+  .catch((err) => console.error("❌ Service Worker registration failed:", err));
 </script>
-<script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/firebase-init.js') }}"></script>
 
 <div class="container-fluid">
     <h2 class="text-center mb-4">Price Trend Dashboard</h2>
