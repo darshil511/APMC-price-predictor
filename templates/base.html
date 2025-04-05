@@ -138,7 +138,7 @@
     </script>
     <script type="module" src="{{ url_for('static', filename='js/firebase-init.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-    <script type="module">
+    <script>
       // alert messages
       function showAlert(type, message) {
         // Create a new alert element
@@ -172,6 +172,8 @@
       function handleLogin() {
         window.location.href = "{{ url_for('auth.login') }}"
       }
+    </script>
+    <script type="module">
       import { messaging, getToken, deleteToken} from '/static/js/firebase-init.js';
       const vapidKey = window.FIREBASE_PUBLIC_KEY;
       

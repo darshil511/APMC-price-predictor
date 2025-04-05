@@ -68,8 +68,7 @@ async function saveTokenToDatabase(token) {
 
 // ✅ Listen for Foreground Messages
 onMessage(messaging, (payload) => {
-    console.log("📩 New notification:", payload);
-    alert(`📩 ${payload.notification.title}: ${payload.notification.body}`);
+    alert(`📩 ${payload.data.title}: ${payload.data.body}`);
 });
 
 if (window.IS_LOGGED_IN) {
