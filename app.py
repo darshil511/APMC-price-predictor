@@ -7,8 +7,9 @@ import csv
 import joblib
 import hashlib
 import base64
+import boto3
+import io
 from statsmodels.tsa.arima.model import ARIMA
-from io import BytesIO
 from matplotlib import font_manager as fm
 from pathlib import Path
 from config import Config
@@ -60,6 +61,61 @@ global_filename = base_dir / "ml_models/commodities_saved_models/commodities_par
 def safe_filename(product_name):
     return hashlib.md5(product_name.encode('utf-8')).hexdigest()
 
+
+# Setup your DigitalOcean Spaces client
+# def get_spaces_client():
+#     return boto3.client(
+#         's3',
+#         region_name=os.getenv("SPACES_REGION"),
+#         endpoint_url=os.getenv("SPACES_ENDPOINT_URL"),
+#         aws_access_key_id=os.getenv("SPACES_ACCESS_KEY"),
+#         aws_secret_access_key=os.getenv("SPACES_SECRET_KEY")
+#     )
+    
+    
+# def load_csv_from_spaces(category: str, filename: str) -> pd.DataFrame:
+#     client = get_spaces_client()
+#     key = f"data/{category}/{filename}"  # e.g., data/fruits/fruits_parameters.csv
+
+#     try:
+#         response = client.get_object(Bucket=os.getenv("SPACES_BUCKET_NAME"), Key=key)
+
+#         df = pd.read_csv(
+#             response['Body'],
+#             parse_dates=["Date"],
+#             index_col="Date",
+#             dayfirst=True
+#         )
+#         print(f"Loaded and parsed CSV from {key}")
+#         return df
+
+#     except Exception as e:
+#         print(f"Error loading CSV from {key}: {e}")
+#         return None
+
+
+# def load_model_from_spaces(category: str, product: str):
+#     try:
+#         # Build S3 key
+#         hashed_name = safe_filename(product)
+#         key = f"ml_models/{category}_saved_models/arima_model_{hashed_name}.pkl"
+#         # print(f"[DEBUG] Trying to fetch model with key: {key}")
+
+#         client = get_spaces_client()
+#         response = client.get_object(Bucket=os.getenv("SPACES_BUCKET_NAME"), Key=key)
+
+#         # Load the model directly from the BytesIO stream
+#         model = joblib.load(io.BytesIO(response['Body'].read()))
+#         # print(f"Model loaded for {product} from {key}")
+#         return model
+
+#     except Exception as e:
+#         print(f"Failed to load model from Spaces: {e}")
+#         import traceback
+#         traceback.print_exc()
+#         return None
+
+
 def get_product_parameters(filename, product_name):
     result = []
     
@@ -88,9 +144,9 @@ def get_products():
 
     # Dynamically construct file path and model directory
     file_path = base_dir / f"data/{category}/{category}_price_data.csv"
-    global_file_path = file_path
-    model_dir = base_dir / f"ml_models/{category}_saved_models"
-    global_model_dir = model_dir
+    # global_file_path = file_path
+    # model_dir = base_dir / f"ml_models/{category}_saved_models"
+    # global_model_dir = model_dir
 
     try:
         # Check if the file exists
@@ -106,7 +162,7 @@ def get_products():
         else:
             return jsonify({"error": "Invalid CSV format"}), 500
 
-        return jsonify({"products": products, "model_dir": str(model_dir)})
+        return jsonify({"products": products})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -352,7 +408,7 @@ def dashboard_data():
 
         # Load ARIMA model
         loaded_model = joblib.load(model_path)
-
+        
         # Observed and Predicted Data
         price_data = product_data["Average Price"]
         pred = loaded_model.get_prediction(start=0, end=len(price_data) - 1)
