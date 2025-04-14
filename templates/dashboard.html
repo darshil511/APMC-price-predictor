@@ -4,28 +4,6 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_dashboard.css') }}">
-<script>
-    window.FIREBASE_CONFIG = {
-        apiKey: "{{ FIREBASE_CONFIG_apiKey }}",
-        authDomain: "{{ FIREBASE_CONFIG_authDomain }}",
-        projectId: "{{ FIREBASE_CONFIG_projectId }}",
-        storageBucket: "{{ FIREBASE_CONFIG_storageBucket }}",
-        messagingSenderId: "{{ FIREBASE_CONFIG_messagingSenderId }}",
-        appId: "{{ FIREBASE_CONFIG_appId }}",
-        measurementId: "{{ FIREBASE_CONFIG_measurementId }}"
-    };
-
-    window.FIREBASE_PUBLIC_KEY = "{{ FIREBASE_PUBLIC_KEY }}";
-</script>
-<script>
-  // ✅ Register the Service Worker
-  navigator.serviceWorker.register('/firebase-messaging-sw.js')
-  .then((registration) => {
-      console.log("✅ Service Worker registered successfully:");
-  })
-  .catch((err) => console.error("❌ Service Worker registration failed:", err));
-</script>
-<script type="module" src="{{ url_for('static', filename='js/firebase-init.js') }}"></script>
 
 <div class="container-fluid">
     <h2 class="text-center mb-4">Price Trend Dashboard</h2>

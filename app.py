@@ -140,7 +140,7 @@ def get_products():
     category = data.get("category")
 
     # Normalize category name (capitalize first letter, lowercase rest)
-    category = category.capitalize()
+    category = category.lower()
 
     # Dynamically construct file path and model directory
     file_path = base_dir / f"data/{category}/{category}_price_data.csv"
@@ -215,6 +215,8 @@ def predict():
     # Get form data
     category = request.form.get("category")
     product = request.form.get("product")
+    
+    category = category.lower()
     
     file_path = base_dir / f"data/{category}/{category}_price_data.csv"
     model_dir = base_dir / f"ml_models/{category}_saved_models"
@@ -383,6 +385,8 @@ def dashboard_data():
     for entry in crops_data:
         category = entry.category
         crop_name = entry.crop_name
+        
+        category = category.lower()
 
         file_path = base_dir / f"data/{category}/{category}_price_data.csv"
         model_dir = base_dir / f"ml_models/{category}_saved_models"

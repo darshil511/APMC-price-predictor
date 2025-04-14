@@ -38,12 +38,12 @@
         right: 10px;
         z-index: 1050;
       }
-      .btn-primary{
+      .btn-primary {
         color: black;
         background-color: #28a745;
         border-color: #28a745;
       }
-      .btn-primary:hover{
+      .btn-primary:hover {
         color: white;
         background-color: #218838;
         border-color: #218838;
@@ -53,7 +53,7 @@
         color: black;
         background-color: #28a745 !important;
       }
-      .dropdown-item{
+      .dropdown-item {
         color: black;
       }
       .dropdown-item:hover {
@@ -68,6 +68,114 @@
     </style>
   </head>
   <body>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+         window.FIREBASE_CONFIG = {{ FIREBASE_CONFIG | tojson | safe }};
+         window.FIREBASE_PUBLIC_KEY = "{{ FIREBASE_PUBLIC_KEY }}";
+         window.IS_LOGGED_IN = {{ is_logged_in | tojson }};
+     </script>
+    <script>
+       // ✅ Register the Service Worker
+       navigator.serviceWorker.register('/firebase-messaging-sw.js')
+       .then((registration) => {
+           console.log("✅ Service Worker registered successfully:");
+       })
+       .catch((err) => console.error("❌ Service Worker registration failed:", err));
+     </script>
+    <script type="module" src="{{ url_for('static', filename='js/firebase-init.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+    <script>
+       // alert messages
+       function showAlert(type, message) {
+         // Create a new alert element
+         const alert = document.createElement('div')
+         alert.classList.add('alert', `alert-${type}`, 'alert-dismissible', 'fade', 'show')
+         alert.setAttribute('role', 'alert')
+         alert.innerHTML = `${message}`
+       
+         // Append the alert to the alert container
+         document.getElementById('alert-container').appendChild(alert)
+       
+         // Optionally, remove the alert after a certain time
+         setTimeout(() => {
+           alert.classList.remove('show')
+         }, 3000)
+       }
+       
+       // Function to check and show stored alerts on page load
+       function checkStoredAlert() {
+         const alertData = localStorage.getItem('alertMessage')
+         if (alertData) {
+           const { type, message } = JSON.parse(alertData)
+           showAlert(type, message)
+           localStorage.removeItem('alertMessage') // Clear after showing
+         }
+       }
+       
+       // Run on page load
+       document.addEventListener('DOMContentLoaded', checkStoredAlert)
+       
+       function handleLogin() {
+         window.location.href = "{{ url_for('auth.login') }}"
+       }
+     </script>
+    <script type="module">
+       import { messaging, getToken, deleteToken} from '/static/js/firebase-init.js';
+       const vapidKey = window.FIREBASE_PUBLIC_KEY;
+       
+       async function handleLogout() {
+         try {
+             //const token = await getToken(messaging, { vapidKey: vapidKey });
+             const response = await fetch('/notifications/check_fcm_token', {
+                 method: 'GET',
+                 credentials: 'include' // Important if you’re using session-based authentication
+             });
+             if (!response.ok) {
+                 throw new Error(`Error fetching token: ${response.status}`);
+             }
+             const data = await response.json();
+             const token = data.token;
+             if (token) {
+                 // Optionally delete from client too
+                 await deleteToken(messaging);
+     
+                 // Notify the backend to delete it from the database
+                 await fetch('/notifications/remove_fcm_token', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({ token })
+                 })
+                 .then(response => response.json())
+                 .then(data => {
+                     console.log("Token removal response:", data.message);
+                 })
+                 .catch(err => {
+                     console.error("Error while removing token:", err);
+                 });
+             }
+         } catch (err) {
+             console.error("Token removal failed", err);
+         }
+         fetch("{{ url_for('auth.logout') }}", { method: 'POST' }) // Backend logout call
+           .then((response) => {
+             if (response.ok) {
+               localStorage.setItem('alertMessage', JSON.stringify({ type: 'success', message: 'Logged out successfully!' }))
+               window.location.href = '/' // Redirect to home
+             }
+           })
+       }
+       //window.handleLogout = handleLogout;
+       // Wait until the DOM is fully loaded, then attach the event listener
+        document.addEventListener('DOMContentLoaded', () => {
+          const logoutBtn = document.getElementById('logoutBtn');
+          if (logoutBtn) {
+            logoutBtn.addEventListener('click', handleLogout);
+          }
+        });
+     </script>
+
     <div id="alert-container"></div>
 
     <!-- Navigation Bar -->
@@ -100,7 +208,7 @@
                     <a class="dropdown-item" href="{{ url_for('auth.profile') }}">Profile</a>
                   </li>
                   <li>
-                    <button class="dropdown-item" onclick="handleLogout()">Logout</button>
+                    <button class="dropdown-item" id="logoutBtn">Logout</button>
                   </li>
                 </ul>
               </li>
@@ -117,108 +225,8 @@
     <!-- Page Content -->
     <div class="container mt-4 content-wrapper">
       {% block content %}
+
       {% endblock %}
     </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        window.FIREBASE_CONFIG = {{ FIREBASE_CONFIG | tojson | safe }};
-        window.FIREBASE_PUBLIC_KEY = "{{ FIREBASE_PUBLIC_KEY }}";
-        window.IS_LOGGED_IN = {{ is_logged_in | tojson }};
-    </script>
-    <script>
-      // ✅ Register the Service Worker
-      navigator.serviceWorker.register('/firebase-messaging-sw.js')
-      .then((registration) => {
-          console.log("✅ Service Worker registered successfully:");
-      })
-      .catch((err) => console.error("❌ Service Worker registration failed:", err));
-    </script>
-    <script type="module" src="{{ url_for('static', filename='js/firebase-init.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
-    <script>
-      // alert messages
-      function showAlert(type, message) {
-        // Create a new alert element
-        const alert = document.createElement('div')
-        alert.classList.add('alert', `alert-${type}`, 'alert-dismissible', 'fade', 'show')
-        alert.setAttribute('role', 'alert')
-        alert.innerHTML = `${message}`
-      
-        // Append the alert to the alert container
-        document.getElementById('alert-container').appendChild(alert)
-      
-        // Optionally, remove the alert after a certain time
-        setTimeout(() => {
-          alert.classList.remove('show')
-        }, 3000)
-      }
-      
-      // Function to check and show stored alerts on page load
-      function checkStoredAlert() {
-        const alertData = localStorage.getItem('alertMessage')
-        if (alertData) {
-          const { type, message } = JSON.parse(alertData)
-          showAlert(type, message)
-          localStorage.removeItem('alertMessage') // Clear after showing
-        }
-      }
-      
-      // Run on page load
-      document.addEventListener('DOMContentLoaded', checkStoredAlert)
-      
-      function handleLogin() {
-        window.location.href = "{{ url_for('auth.login') }}"
-      }
-    </script>
-    <script type="module">
-      import { messaging, getToken, deleteToken} from '/static/js/firebase-init.js';
-      const vapidKey = window.FIREBASE_PUBLIC_KEY;
-      
-      async function handleLogout() {
-        try {
-            //const token = await getToken(messaging, { vapidKey: vapidKey });
-            const response = await fetch('/notifications/check_fcm_token', {
-                method: 'GET',
-                credentials: 'include' // Important if you’re using session-based authentication
-            });
-            if (!response.ok) {
-                throw new Error(`Error fetching token: ${response.status}`);
-            }
-            const data = await response.json();
-            const token = data.token;
-            if (token) {
-                // Optionally delete from client too
-                await deleteToken(messaging);
-    
-                // Notify the backend to delete it from the database
-                await fetch('/notifications/remove_fcm_token', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Token removal response:", data.message);
-                })
-                .catch(err => {
-                    console.error("Error while removing token:", err);
-                });
-            }
-        } catch (err) {
-            console.error("Token removal failed", err);
-        }
-        fetch("{{ url_for('auth.logout') }}", { method: 'POST' }) // Backend logout call
-          .then((response) => {
-            if (response.ok) {
-              localStorage.setItem('alertMessage', JSON.stringify({ type: 'success', message: 'Logged out successfully!' }))
-              window.location.href = '/' // Redirect to home
-            }
-          })
-      }
-      window.handleLogout = handleLogout;
-    </script>
   </body>
 </html>
