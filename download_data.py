@@ -1,12 +1,17 @@
-import os
 import boto3
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 
 SPACES_REGION = os.getenv("SPACES_REGION")
-SPACES_ENDPOINT_URL = os.getenv("SPACES_ENDPOINT_URL")
+SPACES_ENDPOINT_URL = f"https://{SPACES_REGION}.digitaloceanspaces.com"
 SPACES_ACCESS_KEY = os.getenv("SPACES_ACCESS_KEY")
 SPACES_SECRET_KEY = os.getenv("SPACES_SECRET_KEY")
 SPACES_BUCKET_NAME = os.getenv("SPACES_BUCKET_NAME")
+
+# Set your local download base directory
+LOCAL_DOWNLOAD_PATH = "./APMC-price-predictor"
 
 def get_spaces_client():
     return boto3.client(
@@ -17,59 +22,39 @@ def get_spaces_client():
         aws_secret_access_key=SPACES_SECRET_KEY
     )
 
-def list_folders(bucket_name, prefix):
+def download_space_folder(bucket_name, prefix, download_dir):
     client = get_spaces_client()
+
     paginator = client.get_paginator('list_objects_v2')
-    page_iterator = paginator.paginate(
-        Bucket=bucket_name,
-        Prefix=prefix,
-        Delimiter='/'   # This makes it return "folders"
-    )
+    pages = paginator.paginate(Bucket=bucket_name, Prefix=prefix)
 
-    folders = []
-    for page in page_iterator:
-        if 'CommonPrefixes' in page:
-            for cp in page['CommonPrefixes']:
-                folders.append(cp['Prefix'])
-    return folders
+    files_downloaded = 0
 
-def download_objects(bucket_name, prefix, local_base):
-    client = get_spaces_client()
-    paginator = client.get_paginator('list_objects_v2')
-    page_iterator = paginator.paginate(Bucket=bucket_name, Prefix=prefix)
-
-    has_files = False
-    for page in page_iterator:
+    for page in pages:
         if 'Contents' in page:
             for obj in page['Contents']:
                 key = obj['Key']
-                relative_path = os.path.relpath(key, prefix)
-                local_path = os.path.join(local_base, prefix, relative_path)
-                os.makedirs(os.path.dirname(local_path), exist_ok=True)
+                if key.endswith('/'):
+                    continue  # Skip "folders" (S3 is flat, folders are virtual)
 
-                print(f"⬇️ Downloading {key} -> {local_path}")
+                # Compute local path
+                relative_path = key[len(prefix):].lstrip('/')
+                local_path = os.path.join(download_dir, relative_path)
+
+                # Ensure local directory exists
+                Path(local_path).parent.mkdir(parents=True, exist_ok=True)
+
+                print(f"⬇️ Downloading: {key} → {local_path}")
                 client.download_file(bucket_name, key, local_path)
-                has_files = True
-    if not has_files:
-        print(f"⚠️ No files under {prefix}!")
+                files_downloaded += 1
+
+    print(f"\n✅ Download completed! Total files downloaded: {files_downloaded}")
 
 if __name__ == "__main__":
-    LOCAL_BASE = "./downloaded_spaces"
-
-    print("🚀 Connecting to Spaces...")
-
-    # List folders under ml_models
-    model_categories = list_folders(SPACES_BUCKET_NAME, "ml_models/")
-    print(f"📂 Found model categories: {model_categories}")
-
-    for category_prefix in model_categories:
-        download_objects(SPACES_BUCKET_NAME, category_prefix, LOCAL_BASE)
-
-    # List folders under data/
-    data_categories = list_folders(SPACES_BUCKET_NAME, "data/")
-    print(f"📂 Found data categories: {data_categories}")
-
-    for data_prefix in data_categories:
-        download_objects(SPACES_BUCKET_NAME, data_prefix, LOCAL_BASE)
-
-    print("\n✅ DONE! All files downloaded.")
+    target_prefix = "apmc-ml-models/data/"
+    target_local_folder = os.path.join(LOCAL_DOWNLOAD_PATH, "data")
+    download_space_folder(SPACES_BUCKET_NAME, target_prefix, target_local_folder)
+    
+    target_prefix = "apmc-ml-models/ml_models/"
+    target_local_folder = os.path.join(LOCAL_DOWNLOAD_PATH, "ml_models")
+    download_space_folder(SPACES_BUCKET_NAME, target_prefix, target_local_folder)
