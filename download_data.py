@@ -11,7 +11,7 @@ SPACES_SECRET_KEY = os.getenv("SPACES_SECRET_KEY")
 SPACES_BUCKET_NAME = os.getenv("SPACES_BUCKET_NAME")
 
 # Set your local download base directory
-LOCAL_DOWNLOAD_PATH = "./APMC-price-predictor"
+LOCAL_DOWNLOAD_PATH = "./"
 
 def get_spaces_client():
     return boto3.client(
