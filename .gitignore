@@ -3,6 +3,8 @@
 
 apmc-notifications-firebase-adminsdk-fbsvc-096b7561f5.json
 
+Deployment/User-data/app.sh
+Deployment/User-data/db.sh
 Deployment/User-data/script-app.sh
 Deployment/User-data/script-db.sh
 Deployment/Terraform/terraform.tfvars
